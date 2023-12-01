@@ -1,36 +1,35 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: aandom <aandom@student.abudhabi42.ae>      +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/11/25 09:44:11 by aandom            #+#    #+#              #
-#    Updated: 2023/11/25 09:47:32 by aandom           ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+TARGET = ircserv
+OBJ_PATH = obj
+CXX = c++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-NAME = ircserv
+SRCS = main.cpp server.cpp
 
-SRCS = 
-OBJS = 
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98
+OBJS = $(patsubst %.cpp,$(OBJ_PATH)/%.o,$(SRCS))
 
+all: $(TARGET)
 
-%.o: %.cpp
-	$(CC) $(CPPFLAGS) -c $< -o $@
+$(OBJ_PATH)/%.o: %.cpp | $(OBJ_PATH)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(NAME): $(OBJ)
-		 $(CC) $(CPPFLAGS) $(OBJ) -o $(NAME)
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
+	@printf "$(TARGET) Ready!\n"
 
-all: $(NAME)
+$(OBJ_PATH):
+	mkdir -p $(OBJ_PATH)
 
-clean: 
-		rm -f $(OBJ)
+clean:
+	rm -rf $(OBJ_PATH)
 
 fclean: clean
-		rm -rf $(NAME)
+	rm -f $(TARGET)
 
-re: fclean all
+re: clean all
 
-.PHONY: all clean re
+push: fclean
+	git add .
+	git commit -m "Updated on $(shell date +'%Y-%m-%d %H:%M:%S') by $(shell whoami)"
+	git push -u origin master
+
+.PHONY: all clean fclean re push
