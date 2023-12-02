@@ -1,4 +1,4 @@
-#include "includes/server.hpp"
+#include "includes/Server.hpp"
 
 int main (int argc, char *argv[])
 {
@@ -6,7 +6,7 @@ int main (int argc, char *argv[])
         std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
         return 1;
     }
-	server server(argv);
+	Server server(argv);
 	server.init_socket();
 	server.ft_irc();
 	return 0;

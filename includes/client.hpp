@@ -1,9 +1,10 @@
 #pragma once
 
-#include "server.hpp"
+#include "Server.hpp"
 
-typedef struct s_client {
-	int 		socket_fd;
+class Client {
+public:
+	int 		fd;
 	int 		server_port;
 	std::string nickname;
 	std::string username;
@@ -15,4 +16,9 @@ typedef struct s_client {
 	std::string away;
 	std::string mode;
 	std::string ip;
-} t_client;
+
+	Client(int fd, int server_port);
+	Client(Client const &src);
+	Client &operator=(Client const &src);
+	~Client();
+};

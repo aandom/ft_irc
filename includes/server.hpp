@@ -11,18 +11,28 @@
 #include <unistd.h>
 #include <string>
 #include <cstring>
+#include <arpa/inet.h>
+#include <map>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <netdb.h>
+#define _GNU_SOURCE
+#include <poll.h>
 
 #define TRUE             1
 #define FALSE            0
 
-class server {
+class Client;
+
+class Server {
 	public:
 		int 				socket_fd;
 		int					port;
 		int					new_sd;
 		int					rc;
 		char   				buffer[80];
-		struct sockaddr_in6 addr;
+		// struct sockaddr_in6 addr;
+		struct addrinfo		*address;
 		int				    timeout;
 		std::string			password;
 		struct pollfd		fds[200];
@@ -31,11 +41,12 @@ class server {
 		int					end_server;
 		bool				close_conn;
 		bool				compress_array;
+		std::map<int, Client *>	clients;
 
-		server(char *argv[]);
-		~server();
-		server(server const &src);
-		server &operator=(server const &src);
+		Server(char *argv[]);
+		~Server();
+		Server(Server const &src);
+		Server &operator=(Server const &src);
 
 		void 	accept_client ();
 		void 	read_client (int i);
