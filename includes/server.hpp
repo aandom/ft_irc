@@ -15,28 +15,35 @@
 #define TRUE             1
 #define FALSE            0
 
-typedef struct s_server
-{
-	int 				socket_fd;
-	int					port;
-	int					new_sd;
-	int					rc;
-	char   				buffer[80];
-	struct sockaddr_in6 addr;
-	int				    timeout;
-	std::string			password;
-	struct pollfd		fds[200];
-	int					nfds;	
-	int					on;
-	int					end_server;
-	bool				close_conn;
-	bool				compress_array;
-}	t_server;
+class server {
+	public:
+		int 				socket_fd;
+		int					port;
+		int					new_sd;
+		int					rc;
+		char   				buffer[80];
+		struct sockaddr_in6 addr;
+		int				    timeout;
+		std::string			password;
+		struct pollfd		fds[200];
+		int					nfds;	
+		int					on;
+		int					end_server;
+		bool				close_conn;
+		bool				compress_array;
 
-void 	accept_client (t_server *server);
-void 	read_client (t_server *server, int i);
-void 	init_socket (t_server *server);
-void 	init_server (t_server *server, char *argv[]);
-void 	compress_fds (t_server *server);
-void 	ft_poll(t_server *server);
-void 	ft_irc(t_server *server);
+		server(char *argv[]);
+		~server();
+		server(server const &src);
+		server &operator=(server const &src);
+
+		void 	accept_client ();
+		void 	read_client (int i);
+		void 	init_socket ();
+		void 	compress_fds ();
+		void 	ft_poll();
+		void 	ft_irc();
+		void 	close_fds();
+		void 	init_error(std::string error);
+		void	close_connection(int i);
+};
