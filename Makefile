@@ -3,7 +3,7 @@ OBJ_PATH = obj
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = main.cpp Server.cpp Client.cpp
+SRCS = main.cpp Server.cpp Client.cpp Parse.cpp
 
 OBJS = $(patsubst %.cpp,$(OBJ_PATH)/%.o,$(SRCS))
 

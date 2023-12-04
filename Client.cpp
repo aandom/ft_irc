@@ -1,8 +1,8 @@
 #include "includes/Client.hpp"
 
-Client::Client(int fd, int server_port) {
+Client::Client(int fd, char *client_ip) {
 	this->fd = fd;
-	this->server_port = server_port;
+	this->client_ip = client_ip;
 	this->is_registered = false;
 }
 
@@ -14,7 +14,7 @@ Client &Client::operator=(Client const &src) {
 	if (this != &src)
 	{
 		this->fd = src.fd;
-		this->server_port = src.server_port;
+		this->client_ip = src.client_ip;
 		this->nickname = src.nickname;
 		this->username = src.username;
 		this->realname = src.realname;

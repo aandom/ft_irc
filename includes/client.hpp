@@ -5,19 +5,20 @@
 class Client {
 public:
 	int 		fd;
-	int 		server_port;
+	// int 		server_port;
 	std::string nickname;
 	std::string username;
 	std::string realname;
 	std::string hostname;
 	std::string servername;
 	std::string password;
+	std::string client_ip;
 	bool 		is_registered;
 	std::string away;
 	std::string mode;
 	std::string ip;
 
-	Client(int fd, int server_port);
+	Client(int fd, char *server_port);
 	Client(Client const &src);
 	Client &operator=(Client const &src);
 	~Client();

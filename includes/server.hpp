@@ -18,6 +18,9 @@
 #include <netdb.h>
 #define _GNU_SOURCE
 #include <poll.h>
+#include <vector>
+#include "Client.hpp"
+#include "Parse.hpp"
 
 #define TRUE             1
 #define FALSE            0
@@ -30,7 +33,7 @@ class Server {
 		int					port;
 		int					new_sd;
 		int					rc;
-		char   				buffer[80];
+		char   				buffer[256];
 		// struct sockaddr_in6 addr;
 		struct addrinfo		*address;
 		int				    timeout;
@@ -42,6 +45,7 @@ class Server {
 		bool				close_conn;
 		bool				compress_array;
 		std::map<int, Client *>	clients;
+		std::vector<std::string>	commands;
 
 		Server(char *argv[]);
 		~Server();
@@ -57,4 +61,6 @@ class Server {
 		void 	close_fds();
 		void 	init_error(std::string error);
 		void	close_connection(int i);
+		void	create_commands(int fd, std::string str);
+		void 	printClients();
 };
