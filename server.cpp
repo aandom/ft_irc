@@ -45,7 +45,7 @@ Server &Server::operator=(Server const &src) {
 }
 
 void Server::ft_poll() {
-	// std::cout << "Waiting on poll()..." << std::endl;
+	std::cout << "Waiting on poll()..." << std::endl;
 	this->rc = poll(this->fds, this->nfds, -1);
 	if (this->rc < 0)	{
 		perror("  poll() failed");
@@ -76,10 +76,7 @@ void Server::ft_irc() {
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
 				close_connection(i);
 			else if (this->fds[i].fd == this->socket_fd)
-			{
-				// std::cout << "new client " << this->fds[i].revents << std::endl;
 				accept_client();
-			}
 			else
 				read_client(i);
 		}
@@ -179,36 +176,6 @@ void Server::init_socket () {
 	this->fds[0].fd = this->socket_fd;
 	this->fds[0].events = POLLIN;
 	this->timeout = (5 * 60 * 1000);
-
-	// this->socket_fd = socket(AF_INET6, SOCK_STREAM, 0);
-	// if (this->socket_fd < 0)
-	// 	init_error("socket() failed");
-	
-	// this->rc = setsockopt(this->socket_fd, SOL_SOCKET,  SO_REUSEADDR, (char *)&this->on, sizeof(this->on));
-	// if (this->rc < 0)
-	// 	init_error("setsockopt() failed");
-	
-	// // this->rc = ioctl(this->socket_fd, FIONBIO, (char *)&this->on);
-	// this->rc = fcntl(this->socket_fd, F_SETFL, O_NONBLOCK);
-	// if (this->rc < 0)
-	// 	init_error("ioctl() failed");
-
-	// memset(&this->addr, 0, sizeof(this->addr));
-	// this->addr.sin6_family      = AF_INET6;
-	// memcpy(&this->addr.sin6_addr, &in6addr_any, sizeof(in6addr_any));
-	// this->addr.sin6_port = htons(this->port);
-	// this->rc = bind(this->socket_fd, (struct sockaddr *)&this->addr, sizeof(this->addr));
-	// if (this->rc < 0)
-	// 	init_error("bind() failed");
-
-	// this->rc = listen(this->socket_fd, 32);
-	// if (this->rc < 0)
-	// 	init_error("listen() failed");
-
-	// memset(this->fds, 0 , sizeof(this->fds));
-	// this->fds[0].fd = this->socket_fd;
-	// this->fds[0].events = POLLIN;
-	// this->timeout = (5 * 60 * 1000);
 }
 
 void Server::compress_fds () {
