@@ -4,6 +4,7 @@ Client::Client(int fd, char *client_ip) {
 	this->fd = fd;
 	this->client_ip = client_ip;
 	this->is_registered = false;
+	this->is_authenticated = false;
 }
 
 Client::Client(Client const &src) {
@@ -20,7 +21,6 @@ Client &Client::operator=(Client const &src) {
 		this->realname = src.realname;
 		this->hostname = src.hostname;
 		this->servername = src.servername;
-		this->password = src.password;
 		this->is_registered = src.is_registered;
 		this->away = src.away;
 		this->mode = src.mode;

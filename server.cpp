@@ -72,7 +72,7 @@ void Server::init_socket () {
 		init_error("bind() failed");
 	if (listen(this->socket_fd, 10) < 0)
 		init_error("listen() failed");
-	freeaddrinfo(this->address);
+	// freeaddrinfo(this->address);
 	memset(this->fds, 0 , sizeof(this->fds));
 	this->fds[0].fd = this->socket_fd;
 	this->fds[0].events = POLLIN;
@@ -80,7 +80,7 @@ void Server::init_socket () {
 }
 
 void Server::ft_poll() {
-	std::cout << "Waiting on poll()..." << std::endl;
+	// std::cout << "Waiting on poll()..." << std::endl;
 	this->rc = poll(this->fds, this->nfds, -1);
 	if (this->rc < 0)	{
 		perror("  poll() failed");
@@ -131,7 +131,6 @@ void Server::read_client (int i) {
 	std::string str;
 	while (TRUE) 
 	{
-		std::cout << "inside while loop\n";
 		this->rc = recv(this->fds[i].fd, this->buffer, sizeof(this->buffer), 0);
 		if (this->rc < 0) {
 			if (errno != EWOULDBLOCK) {
@@ -146,17 +145,11 @@ void Server::read_client (int i) {
 			this->close_conn = TRUE;
 			break;
 		}
-
-		// server->rc = send(server->fds[i].fd, server->buffer, len, 0);
-		// if (server->rc < 0) {
-		// 	perror("  send() failed");
-		// 	server->close_conn = TRUE;
-		// 	break;
-		// }
 	}
-	std::cout << str.size() << " bytes received\n" << str << std::endl;
-	Parse parse(this, this->clients[this->fds[i].fd], str);
-	parse.parse_command();
+	std::cout << str.size() << " bytes received from " << this->fds[i].fd << "\n" << str << std::endl;
+	Command cmd(this, this->clients[this->fds[i].fd], str);
+	cmd.parse_command();
+	cmd.executeCommand();
 	if (this->close_conn) {
 		close(this->fds[i].fd);
 		this->fds[i].fd = -1;
@@ -189,7 +182,6 @@ void Server::printClients () {
 		std::cout << "realname: " << it->second->realname << std::endl;
 		std::cout << "hostname: " << it->second->hostname << std::endl;
 		std::cout << "servername: " << it->second->servername << std::endl;
-		std::cout << "password: " << it->second->password << std::endl;
 		std::cout << "client_ip: " << it->second->client_ip << std::endl;
 		std::cout << "is_registered: " << it->second->is_registered << std::endl;
 		std::cout << "away: " << it->second->away << std::endl;
@@ -216,6 +208,6 @@ void Server::ft_irc() {
 		}
 		if (this->compress_array)
 			compress_fds();
-		printClients();
+		// printClients();
 	}
 }

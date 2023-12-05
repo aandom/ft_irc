@@ -20,7 +20,9 @@
 #include <poll.h>
 #include <vector>
 #include "Client.hpp"
-#include "Parse.hpp"
+#include "Command.hpp"
+#include "error_codes.hpp"
+#include "reply.hpp"
 
 #define TRUE             1
 #define FALSE            0

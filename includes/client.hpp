@@ -11,9 +11,9 @@ public:
 	std::string realname;
 	std::string hostname;
 	std::string servername;
-	std::string password;
 	std::string client_ip;
 	bool 		is_registered;
+	bool		is_authenticated;
 	std::string away;
 	std::string mode;
 	std::string ip;
