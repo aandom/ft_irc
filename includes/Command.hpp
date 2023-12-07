@@ -26,9 +26,10 @@ public:
 	bool 						isUniqueNickname(std::string nickname);
 	void 						registrationReply();
 
-	/****************************** Registration Commands***************************************/
+	/****************************** Connection Commands***************************************/
 	void						CapCommand();
 	void						NickCommand();
 	void						PassCommand();
 	void						UserCommand();
+	void						pingCommand();
 };

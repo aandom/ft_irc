@@ -144,11 +144,18 @@ void Command::UserCommand() {
 	registrationReply();	
 }
 
+void Command::pingCommand() {
+	if (tokens.size() >= 1)
+		sendResponse("PONG " + client->hostname + " " + tokens[0]);
+	else
+		sendErrorResponse(ERR_NEEDMOREPARAMS, "PING : Need more parameters");
+}
+
 void Command::executeCommand() {
 	if (client->is_registered == false) {
 		if (this->command != "CAP" && this->command != "PASS" && this->command != "NICK" && this->command != "USER")
 		{
-			sendErrorResponse(ERR_NOTREGISTERED, "You have not registered");
+			sendErrorResponse(ERR_UNKNOWNCOMMAND, "unknown command");
 			return;
 		}
 		if (this->command == "NICK") {
