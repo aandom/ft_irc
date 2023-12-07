@@ -9,9 +9,18 @@ Command::Command(Server *server, Client *client, std::string str) {
 
 Command::~Command() { }
 
-// Command::Command(Command const &src) {
-// 	*this = src;
-// }
+Command::Command(Command const &src) {
+	*this = src;
+}
+
+Command &Command::operator=(Command const &src) {
+	if (this != &src) {
+		this->server = src.server;
+		this->client = src.client;
+		this->str = src.str;
+	}
+	return *this;
+}
 
 // Function to tokenize an IRC message
 std::vector<std::string> Command::tokenizeMessage() {
@@ -51,7 +60,7 @@ bool Command::isUniqueNickname(std::string nickname) {
 	return true;
 }
 
-void Command::NickCommand(std::vector<std::string> tokens) {
+void Command::NickCommand() {
 	if (tokens.size() >= 1) {
 		std::string nickname = tokens[0];
 		// Validate and store the nickname
@@ -66,7 +75,7 @@ void Command::NickCommand(std::vector<std::string> tokens) {
 	}
 }
 
-void Command::CapCommand(std::vector<std::string> tokens) {
+void Command::CapCommand() {
 	std::string mes = "CAP * LS :multi-prefix userhost-in-names";
 	if (tokens.size() >= 1) {
 		std::string cap = tokens[0];
@@ -84,7 +93,7 @@ void Command::CapCommand(std::vector<std::string> tokens) {
 	}
 }
 
-void Command::PassCommand(std::vector<std::string> tokens) {
+void Command::PassCommand() {
 	if (tokens.size() >= 1) {
 		if (client->is_registered == true) {
 			sendErrorResponse(ERR_ALREADYREGISTERED, "You may not reregister");
@@ -110,7 +119,7 @@ void Command::registrationReply() {
 	sendResponse(std::string (RPL_ISUPPORT) + "CHANMODES=,k,l,it MODES=2 MAXNICKLEN=16 NICKLEN=16 CHANNELLEN=50 :CHANTYPES=#&\r\n");
 }
 
-void Command::UserCommand(std::vector<std::string> tokens) {
+void Command::UserCommand() {
 	if (this->client->is_registered == true)
 		return (sendErrorResponse(ERR_ALREADYREGISTERED, "You may not reregister"));
 	if (tokens.size() < 4)
@@ -144,16 +153,16 @@ void Command::executeCommand() {
 		}
 		if (this->command == "NICK") {
 			tokens.erase(tokens.begin());
-			NickCommand(tokens);
+			NickCommand();
 		} else if (this->command == "PASS") {
 			tokens.erase(tokens.begin());
-			PassCommand(tokens);
+			PassCommand();
 		} else if (this->command == "CAP") {
 			tokens.erase(tokens.begin());
-			CapCommand(tokens);
+			CapCommand();
 		} else if (this->command == "USER") {
 			tokens.erase(tokens.begin());
-			UserCommand(tokens);
+			UserCommand();
 		}
 	}
 }
