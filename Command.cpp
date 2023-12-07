@@ -1,10 +1,11 @@
 #include "includes/Command.hpp"
 #include <sstream>
 
-Command::Command(Server *server, Client *client, std::string str) {
+Command::Command(Server *server, Client *client, std::string str, int i) {
 	this->server = server;
 	this->client = client;
 	this->str = str;
+	this->i = i;
 }
 
 Command::~Command() { }
@@ -28,9 +29,26 @@ std::vector<std::string> Command::tokenizeMessage() {
     std::istringstream iss(this->str);
     std::string token;
     
-    while (iss >> token)
-        tokens.push_back(token);
-    
+    if (std::strchr(this->str.c_str(), ':')) 
+	{
+		std::vector<std::string> tokensBeforeColon;
+		while (getline(iss, token, ':')) {
+			tokensBeforeColon.push_back(token);
+		}
+		if (tokensBeforeColon.size() >= 2) {
+			std::istringstream issBeforeColon(tokensBeforeColon[0]);
+			while (issBeforeColon >> token) {
+				tokens.push_back(token);
+			}
+			tokens.push_back(tokensBeforeColon[1]);
+		} else
+			tokens.push_back(this->str);
+	}
+	else 
+	{
+		while (iss >> token)
+			tokens.push_back(token);
+	}
     return tokens;
 }
 
@@ -63,7 +81,6 @@ bool Command::isUniqueNickname(std::string nickname) {
 void Command::NickCommand() {
 	if (tokens.size() >= 1) {
 		std::string nickname = tokens[0];
-		// Validate and store the nickname
 		if (!isUniqueNickname(nickname)) {
 			sendErrorResponse(ERR_NICKNAMEINUSE, "Nickname is already in use");
 		} else {
@@ -129,17 +146,18 @@ void Command::UserCommand() {
 	this->client->username = tokens[0];
 	this->client->hostname = tokens[1];
 	this->client->servername = tokens[2];
-	if (tokens[3].size() > 1) {
-		if (tokens[3][0] == ':')
-			this->client->realname = tokens[3].erase(0, 1);
-		if (tokens.size() > 4) {
-			for (size_t i = 4; i < tokens.size(); i++)
-				this->client->realname += " " + tokens[i];
-		}
-		else
-			this->client->realname = tokens[3];
-	} else 
-		sendErrorResponse(ERR_NEEDMOREPARAMS, "USER : Need more parameters");
+	this->client->realname = tokens[3];
+	// if (tokens[3].size() > 1) {
+	// 	if (tokens[3][0] == ':')
+	// 		this->client->realname = tokens[3].erase(0, 1);
+	// 	if (tokens.size() > 4) {
+	// 		for (size_t i = 4; i < tokens.size(); i++)
+	// 			this->client->realname += " " + tokens[i];
+	// 	}
+	// 	else
+	// 		this->client->realname = tokens[3];
+	// } else 
+	// 	sendErrorResponse(ERR_NEEDMOREPARAMS, "USER : Need more parameters");
 	this->client->is_registered = true;
 	registrationReply();	
 }
@@ -149,6 +167,77 @@ void Command::pingCommand() {
 		sendResponse("PONG " + client->hostname + " " + tokens[0]);
 	else
 		sendErrorResponse(ERR_NEEDMOREPARAMS, "PING : Need more parameters");
+}
+
+void Command::operCommand() {
+	if (tokens.size() == 3) {
+		// std::cout << server->operator_password << std::endl;
+		// std::cout << tokens[1] << std::endl;
+		if (tokens[2] == server->operator_password && tokens[1] == client->hostname) {
+			client->is_operator = true;
+			sendResponse(std::string(RPL_YOUREOPER) + " :You are now an IRC operator");
+		} else {
+			sendErrorResponse(ERR_PASSWDMISMATCH, "OPER :Password incorrect");
+		}
+	} else {
+		sendErrorResponse(ERR_NEEDMOREPARAMS, "Error : Wrong Number of parameters");
+	}
+}
+
+void Command::PrivmsgCommand() {
+	if (tokens.size() >= 3) {
+		std::string target = tokens[1];
+		std::string message = tokens[2];
+		if (target[0] == '#') {
+			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+			{
+				if (it->second->nickname == target) {
+					sendResponse("PRIVMSG " + target + " :" + message);
+					return;
+				}
+			}
+			sendErrorResponse(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel");
+		} else {
+			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+			{
+				if (it->second->nickname == target) {
+					sendResponse("PRIVMSG " + target + " :" + message);
+					return;
+				}
+			}
+			sendErrorResponse(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel");
+		}
+	} else {
+		sendErrorResponse(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters");
+	}
+}
+
+void Command::NoticeCommand() {
+	if (tokens.size() >= 3) {
+		std::string target = tokens[1];
+		std::string message = tokens[2];
+		if (target[0] == '#') {
+			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+			{
+				if (it->second->nickname == target) {
+					sendResponse("NOTICE " + target + " :" + message);
+					return;
+				}
+			}
+			sendErrorResponse(ERR_NOSUCHNICK, "NOTICE :No such nick/channel");
+		} else {
+			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+			{
+				if (it->second->nickname == target) {
+					sendResponse("NOTICE " + target + " :" + message);
+					return;
+				}
+			}
+			sendErrorResponse(ERR_NOSUCHNICK, "NOTICE :No such nick/channel");
+		}
+	} else {
+		sendErrorResponse(ERR_NEEDMOREPARAMS, "NOTICE :Need more parameters");
+	}
 }
 
 void Command::executeCommand() {
@@ -171,6 +260,40 @@ void Command::executeCommand() {
 			tokens.erase(tokens.begin());
 			UserCommand();
 		}
+	}
+	else 
+	{
+		if (this->command == "PING") {
+			tokens.erase(tokens.begin());
+			pingCommand();
+		}
+		else if (this->command == "NICK") {
+			tokens.erase(tokens.begin());
+			NickCommand();
+		}
+		else if (this->command == "QUIT") {
+			sendResponse("QUIT :Bye bye");
+			server->clients.erase(client->fd);
+			close(client->fd);
+			this->server->fds[this->i].fd = -1;			
+			server->compress_array = true;
+		}
+		else if (this->command == "OPER") {
+			operCommand();
+		}
+		else if (this->command == "PRIVMSG") {
+			PrivmsgCommand();
+		}
+		else if (this->command == "NOTICE") {
+		}
+		else if (this->command == "JOIN") {
+		//
+		}
+		else if (this->command == "PART") {
+		//
+		}
+		else
+			sendErrorResponse(ERR_UNKNOWNCOMMAND, "unknown command");
 	}
 }
 

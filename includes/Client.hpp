@@ -14,6 +14,7 @@ public:
 	std::string client_ip;
 	bool 		is_registered;
 	bool		is_authenticated;
+	bool		is_operator;
 	std::string away;
 	std::string mode;
 	std::string ip;

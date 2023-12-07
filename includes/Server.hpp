@@ -40,6 +40,7 @@ class Server {
 		struct addrinfo		*address;
 		int				    timeout;
 		std::string			password;
+		std::string			operator_password;
 		struct pollfd		fds[200];
 		int					nfds;	
 		int					on;

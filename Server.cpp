@@ -12,6 +12,7 @@ Server::Server(char *argv[]) {
 	this->end_server = FALSE;
 	this->close_conn = FALSE;
 	this->compress_array = FALSE;
+	this->operator_password = "pa$$word";
 }
 
 Server::~Server() {
@@ -40,6 +41,7 @@ Server &Server::operator=(Server const &src) {
 		this->end_server = src.end_server;
 		this->close_conn = src.close_conn;
 		this->compress_array = src.compress_array;
+		this->operator_password = src.operator_password;
 	}
 	return *this;
 }
@@ -126,7 +128,7 @@ void Server::accept_client () {
 }
 
 void Server::read_client (int i) {
-	std::cout << "  Descriptor " << this->fds[i].fd << " is readable" << std::endl;
+	// std::cout << "  Descriptor " << this->fds[i].fd << " is readable" << std::endl;
 	this->close_conn = FALSE;
 	std::string str;
 	while (TRUE) 
@@ -146,10 +148,11 @@ void Server::read_client (int i) {
 			break;
 		}
 	}
-	std::cout << str.size() << " bytes received from " << this->fds[i].fd << "\n" << str << std::endl;
-	Command cmd(this, this->clients[this->fds[i].fd], str);
+	std::cout << str.size() << " bytes received from " << this->fds[i].fd << std::endl;
+	Command cmd(this, this->clients[this->fds[i].fd], str, i);
 	cmd.parse_command();
 	cmd.executeCommand();
+	memset(this->buffer, 0, sizeof(this->buffer));
 	if (this->close_conn) {
 		close(this->fds[i].fd);
 		this->fds[i].fd = -1;
@@ -187,6 +190,9 @@ void Server::printClients () {
 		std::cout << "away: " << it->second->away << std::endl;
 		std::cout << "mode: " << it->second->mode << std::endl;
 		std::cout << "ip: " << it->second->ip << std::endl;
+		std::cout << "is_authenticated: " << it->second->is_authenticated << std::endl;
+		std::cout << "is_operator: " << it->second->is_operator << std::endl;
+		std::cout << std::endl;
 	}
 }
 
@@ -208,6 +214,6 @@ void Server::ft_irc() {
 		}
 		if (this->compress_array)
 			compress_fds();
-		// printClients();
+		printClients();
 	}
 }
