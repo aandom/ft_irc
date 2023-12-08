@@ -9,11 +9,18 @@ class Command {
 private:
 	Server	*server;
 	Client	*client;
+	
+	struct t_command {
+		std::string name;
+		void (Command::*function)();
+	};
+
 public:
 	std::vector<std::string> 	tokens;
 	std::string					command;
 	std::string					str;
 	int							i;
+	static t_command			r_commands[];
 	Command(Server *server, Client *client, std::string str, int i);
 	~Command();
 	Command(Command const &src);
@@ -36,5 +43,4 @@ public:
 	void						operCommand();
 	/*********************************Sending Message*******************************/
 	void						PrivmsgCommand();
-	void						NoticeCommand();
 };

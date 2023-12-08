@@ -7,7 +7,7 @@ int main (int argc, char *argv[])
         return 1;
     }
 	Server server(argv);
-	server.init_socket();
-	server.ft_irc();
+	server.init_server();
+	server.main_loop();
 	return 0;
 }

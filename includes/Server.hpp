@@ -19,6 +19,7 @@
 #define _GNU_SOURCE
 #include <poll.h>
 #include <vector>
+#include <sstream>
 #include "Client.hpp"
 #include "Command.hpp"
 #include "error_codes.hpp"
@@ -36,7 +37,6 @@ class Server {
 		int					new_sd;
 		int					rc;
 		char   				buffer[256];
-		// struct sockaddr_in6 addr;
 		struct addrinfo		*address;
 		int				    timeout;
 		std::string			password;
@@ -55,12 +55,19 @@ class Server {
 		Server(Server const &src);
 		Server &operator=(Server const &src);
 
+		void 	init_server_address();
+		void 	create_socket();
+		void 	set_socket_options();
+		void 	bind_socket();
+		void 	start_listening();
+		void 	initialize_poll();
+		void 	init_server ();
+
 		void 	accept_client ();
 		void 	read_client (int i);
-		void 	init_socket ();
 		void 	compress_fds ();
 		void 	ft_poll();
-		void 	ft_irc();
+		void 	main_loop();
 		void 	close_fds();
 		void 	init_error(std::string error);
 		void	close_connection(int i);
