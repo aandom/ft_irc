@@ -3,6 +3,7 @@
 Client::Client(int fd, char *client_ip) {
 	this->fd = fd;
 	this->client_ip = client_ip;
+	this->hostname = client_ip;
 	this->is_registered = false;
 	this->is_authenticated = false;
 }

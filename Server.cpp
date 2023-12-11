@@ -160,8 +160,19 @@ void Server::accept_client () {
 	}
 }
 
+std::vector<std::string> splitString(const std::string& input, char delimiter) {
+    std::vector<std::string> tokens;
+    std::istringstream tokenStream(input);
+    std::string token;
+
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
 void Server::read_client (int i) {
-	// std::cout << "  Descriptor " << this->fds[i].fd << " is readable" << std::endl;
 	this->close_conn = FALSE;
 	std::string str;
 	while (TRUE) 
@@ -181,11 +192,14 @@ void Server::read_client (int i) {
 			break;
 		}
 	}
-	// std::cout << str.size() << " bytes received from " << this->fds[i].fd << std::endl;
-	std::cout << "Received: " << str << std::endl;
-	Command cmd(this, this->clients[this->fds[i].fd], str, i);
-	cmd.parse_command();
-	cmd.executeCommand();
+	std::cout << "Received " << str.length() << " bytes in the below string" << std::endl << str;
+	std::vector<std::string> commands = splitString(str, '\n');
+	for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); it++)
+	{
+		Command cmd(this, this->clients[this->fds[i].fd], *it, i);
+		cmd.parse_command();
+		cmd.executeCommand();
+	}
 	memset(this->buffer, 0, sizeof(this->buffer));
 	if (this->close_conn) {
 		close(this->fds[i].fd);

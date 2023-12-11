@@ -28,11 +28,7 @@ public:
 
 	void 						parse_command();
 	void 						executeCommand();
-	std::vector<std::string> 	tokenizeMessage();
-	void						sendErrorResponse(std::string err_code, std::string message);
-	void 						sendResponse(std::string message);
-	bool 						isUniqueNickname(std::string nickname);
-	void 						registrationReply();
+	// void 						UserToUserMessage(std::string message, Client *src, Client *dst);
 
 	/****************************** Connection Commands********************************/
 	void						CapCommand();
@@ -41,6 +37,8 @@ public:
 	void						UserCommand();
 	void						pingCommand();
 	void						operCommand();
+	void						motdCommand();
+	void						quitCommand();
 	/*********************************Sending Message*******************************/
 	void						PrivmsgCommand();
 };

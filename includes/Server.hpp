@@ -24,6 +24,7 @@
 #include "Command.hpp"
 #include "error_codes.hpp"
 #include "reply.hpp"
+#include "Commands_utils.hpp"
 
 #define TRUE             1
 #define FALSE            0
