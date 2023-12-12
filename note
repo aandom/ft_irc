@@ -1,2 +1,3 @@
-authenticated before using NICK cmd 
-implement whois command
+authenticated before using NICK cmd ✅
+implement whois command ✅
+implement userMode command

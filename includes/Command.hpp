@@ -30,7 +30,6 @@ public:
 
 	void 						parse_command();
 	void 						executeCommand();
-	// void 						UserToUserMessage(std::string message, Client *src, Client *dst);
 
 	/****************************** Connection Commands********************************/
 	void						CapCommand();
@@ -41,6 +40,9 @@ public:
 	void						operCommand();
 	void						motdCommand();
 	void						quitCommand();
+	void 						whoisCommand();
+	void						modeCommand();
+	void 						userMode();
 	/*********************************Sending Message*******************************/
 	void						PrivmsgCommand();
 };
