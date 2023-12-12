@@ -149,9 +149,60 @@ void Command::PrivmsgCommand() {
 		serverReply(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters", client);
 }
 
+void Command::userMode() {
+	std::string nickname = tokens[1];
+	for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+	{
+		if (it->second->nickname == nickname) {
+			if (tokens[2][0] == '+')
+			{
+				if (tokens[2][1] == 'o')
+					it->second->is_operator = true;
+				else if (tokens[2][1] == 'i')
+					it->second->user_mode = INVISIBLE;
+				else if (tokens[2][1] == 's')
+					it->second->user_mode = SERVERNOTICES;
+				else if (tokens[2][1] == 'w')
+					it->second->user_mode = WALLOPS;
+			}
+			else if (tokens[2][0] == '-')
+			{
+				if (tokens[2][1] == 'o')
+					it->second->is_operator = false;
+				else if (tokens[2][1] == 'i')
+					it->second->user_mode = 0;
+				else if (tokens[2][1] == 's')
+					it->second->user_mode = 0;
+				else if (tokens[2][1] == 'w')
+					it->second->user_mode = 0;
+			}
+			return;
+		}
+	}	
+	serverReply(ERR_NOSUCHNICK, "MODE :No such nick/channel", client);
+}
+
+void Command::modeCommand() {
+	if (tokens.size() >= 3)
+	{
+		//if channel
+		if (tokens[1][0] == '#')
+		{
+			//
+		}
+		else
+		{
+			userMode();
+		}
+	}
+	else
+		serverReply(ERR_NEEDMOREPARAMS, "MODE :Need more parameters", client);
+}
+
 void Command::motdCommand() {
 	serverReply(RPL_MOTDSTART, ":- " + client->servername + " Message of the day - ", client);
-	serverReply(RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" + client->username + "@" + client->hostname + "", client);
+	serverReply(RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" +  \
+		client->username + "@" + client->hostname + "", client);
 	serverReply(RPL_MOTD, ":- This is a friendly community", client);
 	serverReply(RPL_MOTD, ":- This Ft_IRC server is made by: dsium, aandom, and zsyyida", client);
 	serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);
@@ -212,7 +263,7 @@ void Command::executeCommand() {
 		//
 		}
 		else if (this->command == "MODE") {
-			std::cout << "we will do mode" << std::endl;
+			modeCommand();
 		}
 		else if (this->command == "MOTD")
 			motdCommand();

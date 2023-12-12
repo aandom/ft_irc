@@ -2,6 +2,13 @@
 
 #include "Server.hpp"
 
+enum UserMode {
+    INVISIBLE = 'i',
+    SERVERNOTICES = 's',
+    WALLOPS = 'w',
+    // OPERATOR = 'o'
+};
+
 class Client {
 public:
 	int 		fd;
@@ -15,6 +22,7 @@ public:
 	bool 		is_registered;
 	bool		is_authenticated;
 	bool		is_operator;
+	int			user_mode;
 	std::string away;
 	std::string mode;
 	std::string ip;
