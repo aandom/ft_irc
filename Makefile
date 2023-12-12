@@ -4,7 +4,7 @@ CXX = c++
 sanitizer = -g3 -fsanitize=address -fno-omit-frame-pointer
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = main.cpp Server.cpp Client.cpp Command.cpp Commands_utils.cpp
+SRCS = main.cpp Server.cpp Client.cpp Command.cpp Commands_utils.cpp Channelcmds.cpp Channel.cpp
 
 OBJS = $(patsubst %.cpp,$(OBJ_PATH)/%.o,$(SRCS))
 

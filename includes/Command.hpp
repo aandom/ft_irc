@@ -1,6 +1,8 @@
 #pragma once
 #include "Server.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
+#include "Channelcmds.hpp"
 
 class Server;
 class Client;

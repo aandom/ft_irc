@@ -12,19 +12,21 @@
 #include <string>
 #include <cstring>
 #include <arpa/inet.h>
-#include <map>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <netdb.h>
 #define _GNU_SOURCE
 #include <poll.h>
 #include <vector>
+#include <map>
 #include <sstream>
 #include "Client.hpp"
 #include "Command.hpp"
 #include "error_codes.hpp"
 #include "reply.hpp"
 #include "Commands_utils.hpp"
+#include "Channel.hpp"
+#include "Channelcmds.hpp"
 
 #define TRUE             1
 #define FALSE            0
@@ -74,4 +76,21 @@ class Server {
 		void	close_connection(int i);
 		void	create_commands(int fd, std::string str);
 		void 	printClients();
+
+		std::vector<Channel *> &getChannels();
+		std::map<int, Client *> &getClients();
+		Client * getClientIfExist(std::string const & cname);
+		Channel * getChannelIfExist(std::string const & cname);
+		void	addChannel(Channel * channel);
+		void	removeChannel(Channel * channel);
+		bool	checkIfClientExists(std::string const & cname);
+		std::vector<std::string>  getChannelNames();
+
+		typedef std::vector<Channel *>::iterator ch_iterator;
+		typedef std::map<int, Client *>::iterator cl_iterator;
+
+	private:
+		std::vector<Channel *> _channels;
+
+
 };

@@ -110,6 +110,14 @@ void Command::PrivmsgCommand() {
 	if (tokens.size() >= 3) {
 		std::string target = tokens[1];
 		std::string message = tokens[2];
+		if (target[0] == '#') {
+			try {
+				privMsgchannel(*this->server, this->client, this->tokens);
+			} catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+			}
+			return ;
+		}
 		// if (target[0] == '#' && target[1] == '*' && client->is_operator == true) {
 		// 	for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 		// 	{
@@ -120,14 +128,14 @@ void Command::PrivmsgCommand() {
 		// 	}
 		// 	sendErrorResponse(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel");
 		// } else {
-			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
-			{
-				if (it->second->nickname == target) {
-					UserToUserMessage(message, client, it->second);
-					return;
-				}
+		for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+		{
+			if (it->second->nickname == target) {
+				UserToUserMessage(message, client, it->second);
+				return;
 			}
-			serverReply(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel", client);
+		}
+		serverReply(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel", client);
 		// }
 	} else {
 		serverReply(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters", client);
@@ -174,7 +182,11 @@ void Command::executeCommand() {
 		else if (this->command == "NOTICE") {
 		}
 		else if (this->command == "JOIN") {
-		//
+			try {
+				join(*this->server, this->client, this->tokens);
+			} catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+			}
 		}
 		else if (this->command == "MODE") {
 			std::cout << "we will do mode" << std::endl;

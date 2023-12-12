@@ -98,7 +98,7 @@ void Server::start_listening() {
 void Server::initialize_poll() {
     memset(this->fds, 0 , sizeof(this->fds));
     this->fds[0].fd = this->socket_fd;
-    this->fds[0].events = POLLIN;
+    this->fds[0].events = POLLIN | POLLOUT;
 }
 
 // Initiates the entire socket setup process
@@ -264,4 +264,65 @@ void Server::main_loop() {
 			compress_fds();
 		// printClients();
 	}
+}
+
+
+// channel related
+void	Server::addChannel(Channel * channel) { _channels.push_back(channel); }
+
+std::vector<Channel *> & Server::getChannels() { return _channels;}
+std::map<int, Client *> & Server::getClients() { return clients;}
+
+void	Server::removeChannel(Channel * channel) {
+	ch_iterator it = _channels.begin();
+    ch_iterator it_end = _channels.end();
+    for (; it != it_end; ++it) {
+        if (*it == channel)
+            _channels.erase(it);
+    }
+}
+
+std::vector<std::string> Server::getChannelNames() {
+    std::vector<std::string> chNames;
+    std::string              name;
+	std::vector<Channel *> _members = getChannels(); 
+    ch_iterator it = _members.begin();
+    ch_iterator it_end = _members.end();
+    for (; it != it_end; ++it) {
+        Channel  * channel = *it;
+        chNames.push_back(channel->getChName());
+    }
+    return (chNames);
+}
+
+Channel *	Server::getChannelIfExist(std::string const & cname) {
+    std::vector<Channel *> channels = getChannels();
+    ch_iterator it = channels.begin();
+    ch_iterator it_end = channels.end();
+    for (; it != it_end; ++it) {
+        Channel  * channel = *it;
+        if (channel->getChName() == cname)
+			return (channel);
+    }
+	return (NULL);
+}
+
+Client *	Server::getClientIfExist(std::string const & cname) {
+    std::map<int, Client *> clients = getClients();
+    cl_iterator it = clients.begin();
+    cl_iterator it_end = clients.end();
+    for (; it != it_end; ++it) {
+        Client  * client = it->second;
+        if (client->nickname == cname)
+			return (client);
+    }
+	return (NULL);
+}
+
+
+bool	Server::checkIfClientExists(std::string const & cname) {
+    std::vector<std::string> chNames = getChannelNames();
+    if (std::find(chNames.begin(), chNames.end(), cname) != chNames.end())
+        return(true);
+    return (false);
 }
