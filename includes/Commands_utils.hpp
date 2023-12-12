@@ -11,3 +11,4 @@ std::vector<std::string> 	tokenizeMessage(std::string str);
 bool						isUniqueNickname(std::string nickname, std::map<int, Client *> clients, Client *client);
 void 						registrationReply(Client *client);
 void 						UserToUserMessage(std::string message, Client *src, Client *dst);
+std::vector<std::string> 	splitString(const std::string& input, char delimiter);

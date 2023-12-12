@@ -31,6 +31,10 @@ Command &Command::operator=(Command const &src) {
 }
 
 void Command::NickCommand() {
+	if (client->is_registered == true)
+		return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", client));
+	if (client->is_authenticated == false)
+		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", client));
 	if (tokens.size() >= 2) {
 		std::string nickname = tokens[1];
 		std::cout << "nickname: " << nickname << std::endl;
@@ -84,7 +88,8 @@ void Command::UserCommand() {
 	this->client->servername = tokens[3];
 	this->client->realname = tokens[4];
 	this->client->is_registered = true;
-	registrationReply(this->client);	
+	registrationReply(this->client);
+	motdCommand();
 }
 
 void Command::pingCommand() {
@@ -100,26 +105,36 @@ void Command::operCommand() {
 			client->is_operator = true;
 			serverReply(RPL_YOUREOPER, ":You are now an IRC operator", client);
 		} else
-			serverReply(ERR_PASSWDMISMATCH, "OPER :Password incorrect", client);
+			serverReply(ERR_PASSWDMISMATCH, "OPER : incorrect password or host", client);
 
 	} else
 		serverReply(ERR_NEEDMOREPARAMS, "OPER : Wrong Number of parameters", client);
 }
 
 void Command::PrivmsgCommand() {
-	if (tokens.size() >= 3) {
+	if (tokens.size() >= 3)
+	{
 		std::string target = tokens[1];
 		std::string message = tokens[2];
-		// if (target[0] == '#' && target[1] == '*' && client->is_operator == true) {
-		// 	for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
-		// 	{
-		// 		if (it->second->nickname == target) {
-		// 			sendResponse("PRIVMSG " + target + " :" + message);
-		// 			return;
-		// 		}
-		// 	}
-		// 	sendErrorResponse(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel");
-		// } else {
+		if (target[0] == '#' && target[1] == '*' && client->is_operator == true)
+		{
+			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+				UserToUserMessage(message, client, it->second);
+		}
+		else if (std::strchr(target.c_str(), ','))
+		{
+			std::vector<std::string> targets = splitString(target, ',');
+			for (std::vector<std::string>::iterator it = targets.begin(); it != targets.end(); it++)
+			{
+				for (std::map<int, Client *>::iterator it2 = server->clients.begin(); it2 != server->clients.end(); it2++)
+				{
+					if (it2->second->nickname == *it)
+						UserToUserMessage(message, client, it2->second);
+				}
+			}
+		}
+		else 
+		{
 			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 			{
 				if (it->second->nickname == target) {
@@ -128,10 +143,10 @@ void Command::PrivmsgCommand() {
 				}
 			}
 			serverReply(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel", client);
-		// }
-	} else {
-		serverReply(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters", client);
+		}
 	}
+	else
+		serverReply(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters", client);
 }
 
 void Command::motdCommand() {
@@ -148,6 +163,26 @@ void Command::quitCommand() {
 	close(client->fd);
 	this->server->fds[this->i].fd = -1;			
 	server->compress_array = true;
+}
+
+void Command::whoisCommand() {
+	if (tokens.size() >= 2) {
+		std::string nickname = tokens[1];
+		for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+		{
+			if (it->second->nickname == nickname) {
+				serverReply(RPL_WHOISUSER, nickname + " " + it->second->username + " " + it->second->hostname + " * :" + it->second->realname, client);
+				serverReply(RPL_WHOISSERVER, nickname + " " + it->second->servername + " :Ft_IRC", client);
+				if (it->second->is_operator == true)
+					serverReply(RPL_WHOISOPERATOR, nickname + " :is an IRC operator", client);
+				serverReply(RPL_ENDOFWHOIS, nickname + " :End of WHOIS list", client);
+				return;
+			}
+		}
+		serverReply(ERR_NOSUCHNICK, "WHOIS :No such nick/channel", client);
+	} else {
+		serverReply(ERR_NEEDMOREPARAMS, "WHOIS :Need more parameters", client);
+	}
 }
 
 void Command::executeCommand() {
@@ -171,17 +206,16 @@ void Command::executeCommand() {
 			operCommand();
 		else if (this->command == "PRIVMSG")
 			PrivmsgCommand();
-		else if (this->command == "NOTICE") {
-		}
+		else if (this->command == "WHOIS")
+			whoisCommand();
 		else if (this->command == "JOIN") {
 		//
 		}
 		else if (this->command == "MODE") {
 			std::cout << "we will do mode" << std::endl;
 		}
-		else if (this->command == "MOTD") {
+		else if (this->command == "MOTD")
 			motdCommand();
-		}
 		else
 			serverReply(ERR_UNKNOWNCOMMAND, "unknown command after registration", client);
 	}

@@ -39,6 +39,7 @@ public:
 	void						operCommand();
 	void						motdCommand();
 	void						quitCommand();
+	void 						whoisCommand();
 	/*********************************Sending Message*******************************/
 	void						PrivmsgCommand();
 };

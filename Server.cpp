@@ -160,17 +160,6 @@ void Server::accept_client () {
 	}
 }
 
-std::vector<std::string> splitString(const std::string& input, char delimiter) {
-    std::vector<std::string> tokens;
-    std::istringstream tokenStream(input);
-    std::string token;
-
-    while (std::getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-
-    return tokens;
-}
 
 void Server::read_client (int i) {
 	this->close_conn = FALSE;
@@ -250,7 +239,6 @@ void Server::main_loop() {
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
 		{
-			// std::cout << "i = " << i << " " << "event: " << this->fds[i].revents << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
