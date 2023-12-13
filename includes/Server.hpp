@@ -27,6 +27,7 @@
 #include "Commands_utils.hpp"
 #include "Channel.hpp"
 #include "Channelcmds.hpp"
+#include "servError.hpp"
 
 #define TRUE             1
 #define FALSE            0
@@ -85,7 +86,7 @@ class Server {
 		void	removeChannel(Channel * channel);
 		bool	checkIfClientExists(std::string const & cname);
 		std::vector<std::string>  getChannelNames();
-
+		ErrorCode _errors;
 		typedef std::vector<Channel *>::iterator ch_iterator;
 		typedef std::map<int, Client *>::iterator cl_iterator;
 

@@ -33,6 +33,7 @@ static std::string chcmds[8];
 
 void    sendMsg(int fd, std::string const & msg);
 
+void joinUtil(Server &server, Client *client, std::vector<std::string> &input);
 
 void privMsgchannel(Server &server, Client *client, std::vector<std::string> &input);
 void join(Server &server, Client *client, std::vector<std::string> &input);

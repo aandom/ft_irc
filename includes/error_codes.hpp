@@ -1,5 +1,10 @@
 #pragma once
 
+#include <map>
+#include <iostream>
+#include <algorithm>
+#include <string>
+
 #define ERR_NOSUCHNICK " 401 " 
 #define ERR_NOSUCHSERVER " 402 "
 #define ERR_NOSUCHCHANNEL " 403 "

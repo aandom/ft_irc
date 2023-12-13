@@ -12,3 +12,6 @@ bool						isUniqueNickname(std::string nickname, std::map<int, Client *> clients
 void 						registrationReply(Client *client);
 void 						UserToUserMessage(std::string message, Client *src, Client *dst);
 std::vector<std::string> 	splitString(const std::string& input, char delimiter);
+
+
+void serverReplyofChannel(std::string code, std::string chname ,std::string message, Client *client);
