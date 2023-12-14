@@ -31,6 +31,26 @@ class Channel;
 static std::string chcmds[8];
 
 
+// chcmdsutils
+void   printchannelmembers(Channel * channel);
+void   printVector(std::vector<std::string> & input);
+std::vector<std::string> splitStringTwo(std::string str, char delim);
+std::string getErrmsg(int code, Server &server );
+int checkChannelName(std::string & chname, int *status);
+int checkChInput(std::vector<std::string> & input, size_t minpars);
+int checkModes(Channel * channel, Client * client, std::vector<std::string> & input, char checkfor);
+
+std::string getJoinMessage(Client * client, std::vector<std::string> & input);
+std::string getNewTopic(std::vector<std::string> & input);
+std::string getPartMessage(Client * client, std::vector<std::string> & input);
+std::string getTopicMessage(Client * client, std::vector<std::string> & input);
+std::string getInviteMessage(Client * client, std::vector<std::string> & input);
+void    sendMessage(std::string const &msg, Channel * channel);
+std::string getReason(std::vector<std::string> & input);
+std::string getKickMessage(Client * client, std::vector<std::string> & input);
+
+
+
 void    sendMsg(int fd, std::string const & msg);
 
 void joinUtil(Server &server, Client *client, std::vector<std::string> &input);
@@ -39,7 +59,8 @@ void privMsgchannel(Server &server, Client *client, std::vector<std::string> &in
 void join(Server &server, Client *client, std::vector<std::string> &input);
 void part(Server &server, Client *client, std::vector<std::string> &input);
 void topic(Server &server, Client *client, std::vector<std::string> &input);
-void names(Server &server, Client *client, Channel *channel);
+// void names(Server &server, Client *client, Channel *channel);
+void names(Server &server, Client *client, std::vector<std::string> &input);
 void invite(Server &server, Client *client, std::vector<std::string> &input);
 void kick(Server &server, Client *client, std::vector<std::string> &input);
 

@@ -1,5 +1,8 @@
 #include "includes/Command.hpp"
 
+m_func Command::chcmd[6] = { join, part, topic, invite, kick, names};
+std::string Command::cmds[6] = {"JOIN", "PART", "TOPIC", "INVITE", "KICK", "NAMES"};
+
 Command::Command(Server *server, Client *client, std::string str, int i) {
 	this->server = server;
 	this->client = client;
@@ -262,6 +265,41 @@ void Command::executeCommand() {
 		else if (this->command == "JOIN") {
 			try {
 				join(*this->server, this->client, this->tokens);
+			} catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+			}
+		}
+		else if (this->command == "PART") {
+			try {
+				part(*this->server, this->client, this->tokens);
+			} catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+			}
+		}
+		else if (this->command == "TOPIC") {
+			try {
+				topic(*this->server, this->client, this->tokens);
+			} catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+			}
+		}
+		else if (this->command == "INVITE") {
+			try {
+				invite(*this->server, this->client, this->tokens);
+			} catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+			}
+		}
+		else if (this->command == "KICK") {
+			try {
+				kick(*this->server, this->client, this->tokens);
+			} catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+			}
+		}
+		else if (this->command == "NAMES") {
+			try {
+				names(*this->server, this->client, this->tokens);
 			} catch (std::exception &e) {
 				std::cout << e.what() << std::endl;
 			}

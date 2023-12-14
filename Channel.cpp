@@ -15,7 +15,7 @@
 Channel::Channel(std::string &name, std::string &key) : _chName(name),
                                                         _chKey(key),
                                                         _chLimit(0),
-                                                        _topic("Topic not set yet")
+                                                        _topic("")
 {
     _mode['k'] = false;
     _mode['i'] = false;
@@ -54,7 +54,7 @@ std::string const &     Channel::getTopic() const {return _topic;}
 size_t                  Channel::getChLimit() const {return _chLimit;}
 size_t                  Channel::getChSize() const {return _members.size();}
 
-std::vector<std::string> Channel::getNickNames() {
+std::vector<std::string> Channel::getNickNames(int adminIcon) {
     std::vector<std::string> nicknames;
     std::vector <Client *>   admins = getAdmins();
     std::string              name;
@@ -63,7 +63,10 @@ std::vector<std::string> Channel::getNickNames() {
     for (; it != it_end; ++it) {
         Client  * user = *it;
         // name = (user == _admin ? "" : "") + user->nickname;
-        name = ((std::find(admins.begin(), admins.end(), user) != admins.end()) ? "" : "") + user->nickname;
+        if (adminIcon)
+            name = ((std::find(admins.begin(), admins.end(), user) != admins.end()) ? "@" : "") + user->nickname;
+        else
+            name = ((std::find(admins.begin(), admins.end(), user) != admins.end()) ? "" : "") + user->nickname;
         nicknames.push_back(name);
     }
     return (nicknames);
@@ -91,7 +94,7 @@ void    Channel::removeClient(Client * client) {
 }
 
 bool    Channel::checkIfMember(const std::string & clientname) {
-    std::vector<std::string> nicknames = getNickNames();
+    std::vector<std::string> nicknames = getNickNames(0);
     if (std::find(nicknames.begin(), nicknames.end(), clientname) != nicknames.end())
         return(true);
     return (false);

@@ -7,6 +7,8 @@
 class Server;
 class Client;
 
+typedef void (*m_func)(Server &, Client *, std::vector<std::string> &);
+
 class Command {
 private:
 	Server	*server;
@@ -27,6 +29,9 @@ public:
 	~Command();
 	Command(Command const &src);
 	Command &operator=(Command const &src);
+
+	static m_func chcmd[6];
+	static std::string cmds[6];
 
 	void 						parse_command();
 	void 						executeCommand();

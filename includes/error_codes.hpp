@@ -61,7 +61,10 @@
 #define ERR_INVITEONLYCHAN_MSG " :Cannot join channel (+i)"
 #define ERR_BADCHANNELKEY_MSG " :Cannot join channel (+k)"
 #define ERR_BADCHANMASK_MSG " 476 "
-#define ERR_NOPRIVILEGES_MSG ":Permission Denied- You're not an IRC operator"
+#define ERR_NOPRIVILEGES_MSG " :Permission Denied- You're not an IRC operator"
 #define ERR_CHANOPRIVSNEEDED_MSG " :You're not channel operator"
-#define ERR_UMODEUNKOWNFLAG_MSG ":Unknown MODE flag"
-#define ERR_USERSDONTMATCH_MSG ":Cant change mode for other users"
+#define ERR_UMODEUNKOWNFLAG_MSG " :Unknown MODE flag"
+#define ERR_USERSDONTMATCH_MSG " :Cant change mode for other users"
+
+#define RPL_NOTOPIC_MSG " :No topic is set"
+#define RPL_INVITING_MSG " has been invited to "

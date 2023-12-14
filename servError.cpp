@@ -3,6 +3,8 @@
 ErrorCode::ErrorCode() {
 
     std::string _tostr = "";
+    _errmsgs [331] =  _tostr + RPL_NOTOPIC_MSG ; 
+    _errmsgs [341] =  _tostr + RPL_INVITING_MSG ; 
     _errmsgs [401] =  _tostr + ERR_NOSUCHNICK_MSG ; 
     _errmsgs [402] =  _tostr + ERR_NOSUCHSERVER_MSG;
     _errmsgs [403] =  _tostr + ERR_NOSUCHCHANNEL_MSG;

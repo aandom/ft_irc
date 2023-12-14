@@ -55,7 +55,7 @@ class Channel
         std::string const &     getTopic() const;
         size_t                  getChLimit() const;
         size_t                  getChSize() const;
-        std::vector<std::string> getNickNames();
+        std::vector<std::string> getNickNames(int adminIcon);
 
         void    setChKey(std::string key);
         void    setChLimit(size_t limit);
