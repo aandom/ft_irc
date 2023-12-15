@@ -191,7 +191,15 @@ void Command::modeCommand() {
 		//if channel
 		if (tokens[1][0] == '#')
 		{
-			//
+			try
+			{
+				mode(*this->server, this->client, this->tokens);
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << '\n';
+			}
+			
 		}
 		else
 		{

@@ -73,6 +73,7 @@ std::vector<std::string> Channel::getNickNames(int adminIcon) {
 }
 
 void    Channel::setChKey(std::string key) {_chKey = key;}
+void    Channel::setMode(char c, bool status) {_mode[c] = status;}
 void    Channel::setChLimit(size_t limit) {_chLimit = limit;}
 void    Channel::setTopic(std::string const & topic) { _topic = topic;}
 

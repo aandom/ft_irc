@@ -11,7 +11,7 @@ void   sendTopicAndMembers(Channel *channel, Client *client, int isname) {
     if (!isname)
         serverReply("332", topic, client);
     serverReply("353", names, client);
-    serverReply("366",  channel->getChName() + " :END of NAMES list", client); 
+    serverReply("366",  channel->getChName() + " :END of /NAMES list", client); 
 }
 
 void popElementsOfVector(std::vector<std::string> &input) {
@@ -361,11 +361,58 @@ void kick(Server &server, Client *client, std::vector<std::string> &input) {
 
 }
 
+char extractSign(std::string input) {
+    return (input[0]);
 
+}
 
+char extractMode(std::string input) {
+    return (input[1]);
+}
 
+void mode(Server &server, Client *client, std::vector<std::string> &input) {
 
+	Channel *channel;
+    int      status;
+    std::string chname = "";
+    std::string trimed = "";
+    char        mode;
+    char        sign;
 
+    if (input.size() > 2)
+        chname = input[1];
+    status = checkChInput(input, 2);
+    if (status) {
+        serverReplyofChannel(std::to_string(status), chname, getErrmsg(status, server), client);
+        throw std::invalid_argument(getErrmsg(status, server));
+    }
+    channel = server.getChannelIfExist(input[1]);
+    if (channel == NULL) {
+    
+        serverReplyofChannel("403", chname, getErrmsg(403, server), client);
+        throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
+    }
+
+	if (!channel->checkIfMember(client->nickname)) {
+        serverReplyofChannel("442", chname, getErrmsg(442, server), client);
+		throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
+    }
+	if (!channel->isOperator(client)){
+        serverReply("482", getErrmsg(482, server), client);
+		throw std::invalid_argument((ERR_CHANOPRIVSNEEDED_MSG));
+    }
+    trimed = trimChars(input[2], " \n\r ");
+    sign = extractSign(trimed);
+    mode = extractMode(trimed);
+    if (sign == '+' && !channel->getmodeAt(mode))
+        channel->setMode(mode, true);
+    else if (sign == '-' && channel->getmodeAt(mode))
+        channel->setMode(mode, false);
+    // delete &trimed;
+	// send remove message to 
+    sendMessage(getModeMessage(client, input), channel);
+	return ;
+}
 
 
 

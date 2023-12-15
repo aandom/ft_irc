@@ -21,6 +21,21 @@ void   printVector(std::vector<std::string> & input) {
 }
 
 
+static std::string leftTrim(const std::string &s, const std::string tobetrimed) {
+    size_t start = s.find_first_not_of(tobetrimed);
+    return (start == std::string::npos) ? "" : s.substr(start);
+}
+ 
+static std::string rightTrim(const std::string &s, const std::string tobetrimed) {
+    size_t end = s.find_last_not_of(tobetrimed);
+    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+}
+
+std::string trimChars(std::string str, const std::string tobetrimed) {
+	return (rightTrim(leftTrim(str, tobetrimed), tobetrimed));	
+}
+
+
 std::vector<std::string> splitStringTwo(std::string str, char delim) {
     std::vector<std::string> res;
     std::string token = "";
@@ -60,8 +75,7 @@ int checkChannelName(std::string & chname, int *status) {
 
 int checkChInput(std::vector<std::string> & input, size_t minpars) {
     int status;
-
-    std::cout << "len " << input.size() << "< " << minpars <<  std::endl;
+    
     if (input.size() < minpars)
         return (461); // Invalid number of parameters
     if (minpars == 3 && input[0] == "INVITE")
@@ -155,6 +169,14 @@ std::string getKickMessage(Client * client, std::vector<std::string> & input) {
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
               + " KICK " + input[1] + " " + input[2]; 
+    return (res);
+}
+
+std::string getModeMessage(Client * client, std::vector<std::string> & input) {
+    std::string res;
+
+    res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
+              + " MODE " + input[1] + " " + input[2]; 
     return (res);
 }
 

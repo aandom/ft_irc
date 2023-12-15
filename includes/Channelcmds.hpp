@@ -32,6 +32,7 @@ static std::string chcmds[8];
 
 
 // chcmdsutils
+std::string trimChars(std::string str, const std::string tobetrimed);
 void   printchannelmembers(Channel * channel);
 void   printVector(std::vector<std::string> & input);
 std::vector<std::string> splitStringTwo(std::string str, char delim);
@@ -48,6 +49,7 @@ std::string getInviteMessage(Client * client, std::vector<std::string> & input);
 void    sendMessage(std::string const &msg, Channel * channel);
 std::string getReason(std::vector<std::string> & input);
 std::string getKickMessage(Client * client, std::vector<std::string> & input);
+std::string getModeMessage(Client * client, std::vector<std::string> & input);
 
 
 
@@ -63,5 +65,6 @@ void topic(Server &server, Client *client, std::vector<std::string> &input);
 void names(Server &server, Client *client, std::vector<std::string> &input);
 void invite(Server &server, Client *client, std::vector<std::string> &input);
 void kick(Server &server, Client *client, std::vector<std::string> &input);
+void mode(Server &server, Client *client, std::vector<std::string> &input);
 
 #endif

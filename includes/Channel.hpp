@@ -58,6 +58,7 @@ class Channel
         std::vector<std::string> getNickNames(int adminIcon);
 
         void    setChKey(std::string key);
+        void    setMode(char c, bool status);
         void    setChLimit(size_t limit);
         void    setTopic(std::string const & topic);
 
