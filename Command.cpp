@@ -186,26 +186,17 @@ void Command::userMode() {
 }
 
 void Command::modeCommand() {
-	if (tokens.size() >= 3)
+	if (tokens.size() >= 2 && tokens[1][0] == '#')
 	{
-		//if channel
-		if (tokens[1][0] == '#')
-		{
-			try
-			{
-				mode(*this->server, this->client, this->tokens);
-			}
-			catch(const std::exception& e)
-			{
-				std::cerr << e.what() << '\n';
-			}
+		try {
+			mode(*this->server, this->client, this->tokens);
+		} catch(const std::exception& e) {
+			std::cerr << e.what() << '\n';
+		}
 			
-		}
-		else
-		{
-			userMode();
-		}
 	}
+	else if (tokens.size() >= 3)
+		userMode();
 	else
 		serverReply(ERR_NEEDMOREPARAMS, "MODE :Need more parameters", client);
 }

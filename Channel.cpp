@@ -124,9 +124,13 @@ void    Channel::addToInvitation(Client * client) {
 }
 
 void    Channel::removeFromInvitation(Client * client) {
-    std::vector<int> invitees = getInvitation();
-    std::vector<int>::iterator it = std::find(invitees.begin(), invitees.end(), client->fd);
-    if (std::find(invitees.begin(), invitees.end(), client->fd) != invitees.end())
-        invitees.erase(it);
+    // std::vector<int> invitees = getInvitation();
+    std::vector<int>::iterator it = std::find(this->_invitations.begin(), this->_invitations.end(), client->fd);
+    if (it != this->_invitations.end())
+    {
+        std::cout << "found the fd to delete " << *it << " " << client->fd << std::endl;
+        this->_invitations.erase(it);
+        // invitees.erase(it);
+    }
 }
 

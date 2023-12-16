@@ -50,6 +50,8 @@ void    sendMessage(std::string const &msg, Channel * channel);
 std::string getReason(std::vector<std::string> & input);
 std::string getKickMessage(Client * client, std::vector<std::string> & input);
 std::string getModeMessage(Client * client, std::vector<std::string> & input);
+std::string getModeMessageTwo(Client * client, std::string chname , std::string & input);
+std::string getMofchannel(Channel * channel);
 
 
 

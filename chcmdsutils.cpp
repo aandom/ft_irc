@@ -93,10 +93,15 @@ int checkModes(Channel * channel, Client * client, std::vector<std::string> & in
     {
         if (channel->getmodeAt('i') && !channel->isInvited(client))
             return (473);
+        if (channel->getmodeAt('i') && channel->isInvited(client))
+            return (0);
         if (channel->getmodeAt('l') && (channel->getNickNames(0).size() >= channel->getChLimit()))
             return (471);
-        if ((channel->getmodeAt('k') && input.size() < 3) && channel->getChKey().compare(input[2]))
+        if ((channel->getmodeAt('k') && input.size() < 3))
             return (475);
+        if ((channel->getmodeAt('k') && input.size() >= 3) && channel->getChKey().compare(input[2]))
+            return (475);
+        
     }
     else if (checkfor == 't') {
         if (channel->getmodeAt('t') && !channel->isOperator(client))
@@ -177,6 +182,28 @@ std::string getModeMessage(Client * client, std::vector<std::string> & input) {
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
               + " MODE " + input[1] + " " + input[2]; 
+    return (res);
+}
+
+std::string getModeMessageTwo(Client * client, std::string chname , std::string & input) {
+    std::string res;
+
+    res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
+              + " MODE "  + chname  + " :[ " + input + " ]"; 
+    return (res);
+}
+
+std::string getMofchannel(Channel * channel) {
+    std::string res  = "+";
+
+    if (channel->getmodeAt('k'))
+        res += 'k';
+    if (channel->getmodeAt('i'))
+        res += 'i';
+    if (channel->getmodeAt('t'))
+        res += 't';
+    if (channel->getmodeAt('l'))
+        res += 'l';
     return (res);
 }
 

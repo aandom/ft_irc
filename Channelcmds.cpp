@@ -125,6 +125,7 @@ void joinUtil(Server &server, Client *client, std::vector<std::string> &input) {
     if (channel->checkIfMember(client->nickname))
         return ;
     channel->addClient(client);
+    channel->removeFromInvitation(client);
     // printchannelmembers(channel);
     sendMessage(getJoinMessage(client, input), channel);
     sendTopicAndMembers(channel, client, 0);
@@ -251,6 +252,10 @@ void topic(Server &server, Client *client, std::vector<std::string> &input) {
         serverReplyofChannel("442", chname, getErrmsg(442, server), client);
 		throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
     }
+	if (input.size() == 2 && channel->getTopic().size() > 0) {
+        serverReply("332", channel->getChName() + " " + channel->getTopic(), client);
+		return ;
+	}
     status = checkModes(channel, client, input, 't');
     if (status) {
         serverReplyofChannel("482", chname, getErrmsg(482, server), client);
@@ -261,13 +266,9 @@ void topic(Server &server, Client *client, std::vector<std::string> &input) {
         serverReplyofChannel("331", chname, getErrmsg(331, server), client);
 		throw std::invalid_argument(getErrmsg(331, server));
     }
-	if (input.size() == 2 && channel->getTopic().size() > 0) {
-        serverReply("332", channel->getChName() + " " + channel->getTopic(), client);
-		return ;
-	}
     new_topic = getNewTopic(input);
 	channel->setTopic(new_topic);
-    sendMessage(getTopicMessage(client, input) + new_topic , channel);
+    sendMessage(getTopicMessage(client, input) + " " + new_topic , channel);
 	return ; 
 }
 
@@ -370,16 +371,107 @@ char extractMode(std::string input) {
     return (input[1]);
 }
 
+
+
+
+void tryApplyMode(Server &server, Client *client, Channel *channel, std::vector<std::string> &input) {
+
+}
+
+void modeUtils(Server &server, Client *client, Channel *channel, std::vector<std::string> &input) {
+    std::string trimed = trimChars(input[2], " \n\r ");
+    std::map<std::string, std::string>  newmodes;
+    std::map<char, bool>        chmode = channel->getMode();
+    size_t          counter = 3;
+    int             c = 0;
+    std::string appliedmode = "";
+    std::string newm;
+    char        sign = trimed[0];
+    appliedmode += sign;
+
+    for (std::string::iterator it = trimed.begin() + 1; it != trimed.end(); it++) {
+        if ((sign == '+' || sign == '-') && (*it == 'k' && input.size() <= counter)) {
+            serverReplyofChannel(ERR_NEEDMOREPARAMS, channel->getChName() , getErrmsg(461, server), client);
+        }
+        else if ((sign == '+' || sign == '-') && (*it == 'k' && input.size() > counter)) {
+            if (sign == '+')
+                newmodes["+k"] = input[counter];
+            else
+                newmodes["-k"] = input[counter];
+            appliedmode += *it;
+            counter++;
+        }
+        else if ((sign == '+' || sign == '-') && (*it == 'l' && input.size() > counter)) {
+            if (sign == '+') {
+                newmodes["+l"] = input[counter];
+                counter++;
+            }
+            else
+                newmodes["-l"] = "";
+            appliedmode += *it;
+        }
+        else if ((sign == '+' || sign == '-') && (chmode.find(*it) != chmode.end())) {
+            newm = "";
+            newm = newm + sign + *it;
+            newmodes[newm] = "";
+            appliedmode += *it;
+        }
+        else if ((*it == '+' || *it == '-') && c == 1)
+            serverReplyofChannel(ERR_NEEDMOREPARAMS, channel->getChName() , getErrmsg(461, server), client);
+        else if ((*it == '+' || *it == '-') && c > 1){
+            sign = *it;
+            appliedmode += *it;
+        }
+        else
+            serverReplyofChannel(ERR_NEEDMOREPARAMS, channel->getChName() , getErrmsg(461, server), client);
+        c++;
+    }
+    std::map<std::string, std::string>::iterator cit = newmodes.begin();
+    for (; cit != newmodes.end(); cit++) {
+        std::cout << cit->first << " - ";
+        if (cit->first == "+k" && !channel->getmodeAt('k') && cit->second != "") {
+            channel->setMode('k', true);
+            channel->setChKey(cit->second);
+            // appliedmode += "+k";
+        }
+        else if (cit->first == "-k" && channel->getmodeAt('k') && cit->second != "") {
+            channel->setMode('k', false);
+            channel->setChKey("");
+            // appliedmode += "-k";
+        }
+        else if (cit->first == "+i" && !channel->getmodeAt('i')) {
+            channel->setMode('i', true);
+            // appliedmode += "+i";
+        }
+        else if (cit->first == "-i" && channel->getmodeAt('i')) {
+            channel->setMode('i', false);
+            // appliedmode += "-i";
+        }
+        else if (cit->first == "+t" && !channel->getmodeAt('t')) {
+            channel->setMode('t', true);
+            // appliedmode += "+t";
+        }
+        else if (cit->first == "-t" && channel->getmodeAt('t')) {
+            channel->setMode('t', false);
+            // appliedmode += "-t";
+        }
+    }
+    std::cout << std::endl;
+    if (appliedmode.size() != 0)
+    sendMessage(getModeMessageTwo(client, input[1], appliedmode), channel);
+
+}
+
 void mode(Server &server, Client *client, std::vector<std::string> &input) {
 
 	Channel *channel;
     int      status;
     std::string chname = "";
     std::string trimed = "";
-    char        mode;
-    char        sign;
+    // char        mode;
+    // char        sign;
 
-    if (input.size() > 2)
+    if (input.size() >= 2)
         chname = input[1];
     status = checkChInput(input, 2);
     if (status) {
@@ -397,22 +489,24 @@ void mode(Server &server, Client *client, std::vector<std::string> &input) {
         serverReplyofChannel("442", chname, getErrmsg(442, server), client);
 		throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
     }
+    if (input.size() == 2)
+        return (serverReply(" 324 ", chname + " " + getMofchannel(channel), client));
 	if (!channel->isOperator(client)){
         serverReply("482", getErrmsg(482, server), client);
 		throw std::invalid_argument((ERR_CHANOPRIVSNEEDED_MSG));
     }
-    trimed = trimChars(input[2], " \n\r ");
-    sign = extractSign(trimed);
-    mode = extractMode(trimed);
-    if (sign == '+' && !channel->getmodeAt(mode))
-        channel->setMode(mode, true);
-    else if (sign == '-' && channel->getmodeAt(mode))
-        channel->setMode(mode, false);
+    modeUtils(server, client, channel, input);
+    // trimed = trimChars(input[2], " \n\r ");
+    // sign = extractSign(trimed);
+    // mode = extractMode(trimed);
+    // if (sign == '+' && !channel->getmodeAt(mode))
+    //     channel->setMode(mode, true);
+    // else if (sign == '-' && channel->getmodeAt(mode))
+    //     channel->setMode(mode, false);
     // delete &trimed;
-	// send remove message to 
-    sendMessage(getModeMessage(client, input), channel);
+	// send remove message to
+    // sendMessage(getModeMessage(client, input), channel);
 	return ;
 }
-
 
 
