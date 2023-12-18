@@ -72,6 +72,8 @@ class Channel
         bool    isOperator(Client * src);
         bool    getmodeAt(char c);
         bool    isInvited(Client * clinet);
+        bool    isNickIsAdmin(const std::string & clientname);
+        void    removeAddmin(Client * client);
         
         void    addToInvitation(Client * client);
         void    removeFromInvitation(Client * client);

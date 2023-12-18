@@ -85,18 +85,54 @@ void    Channel::addClient(Client * client) { _members.push_back(client); }
 void    Channel::addAdmin(Client * client) { _admins.push_back(client); }
 
 void    Channel::removeClient(Client * client) {
+    Client *newadmin = NULL;
     ch_iterator it = _members.begin();
     ch_iterator it_end = _members.end();
     for (; it != it_end; ++it) {
-        if (*it == client)
+        if (*it == client) {
+            if (isOperator (client) && _admins.size() == 1 && _members.size() > 1) {
+                this->removeAddmin(client);
+                if (client != *(_members.begin()))
+                    newadmin = *(_members.begin());
+                else
+                    newadmin = *(_members.begin() + 1);
+                if (newadmin != NULL)
+                    this->addAdmin(newadmin);
+            }
             _members.erase(it);
+            if (_members.size() == 0)
+            {
+                std::cout << "YOU MIGHT NEED TO DELETE THE CHANNEL AT THIS POINT" << std::endl;
+            }
+        }
+    }
+
+    // client->removeChannel(_chName);
+    this->removeAddmin(client);
+}
+
+void    Channel::removeAddmin(Client * client) {
+    ch_iterator it = _admins.begin();
+    ch_iterator it_end = _admins.end();
+    for (; it != it_end; ++it) {
+        if (*it == client)
+            _admins.erase(it);
     }
     // client->removeChannel(_chName);
 }
 
+
 bool    Channel::checkIfMember(const std::string & clientname) {
     std::vector<std::string> nicknames = getNickNames(0);
     if (std::find(nicknames.begin(), nicknames.end(), clientname) != nicknames.end())
+        return(true);
+    return (false);
+}
+
+bool    Channel::isNickIsAdmin(const std::string & clientname) {
+    std::string clname = "@" + clientname;
+    std::vector<std::string> nicknames = getNickNames(1);
+    if (std::find(nicknames.begin() , nicknames.end(), clname) != nicknames.end())
         return(true);
     return (false);
 }
