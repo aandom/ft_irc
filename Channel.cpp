@@ -92,10 +92,11 @@ void    Channel::removeClient(Client * client) {
         if (*it == client) {
             if (isOperator (client) && _admins.size() == 1 && _members.size() > 1) {
                 this->removeAddmin(client);
-                if (client != *(_members.begin()))
-                    newadmin = *(_members.begin());
-                else
-                    newadmin = *(_members.begin() + 1);
+                // if (client != *(_members.begin()))
+                //     newadmin = *(_members.begin());
+                // else
+                //     newadmin = *(_members.begin() + 1);
+                newadmin = (client != *(_members.begin())) ? *(_members.begin()) : *(_members.begin() + 1);
                 if (newadmin != NULL)
                     this->addAdmin(newadmin);
             }

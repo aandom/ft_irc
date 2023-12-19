@@ -20,6 +20,13 @@ void   printVector(std::vector<std::string> & input) {
     std::cout << "] #########]" << std::endl;
 }
 
+std::string intToStr(int nbr) {
+    std::stringstream tmp;  
+    tmp << nbr;      
+    std::string str;          
+    tmp >> str;
+    return ( " " + str + " "); 
+}
 
 static std::string leftTrim(const std::string &s, const std::string tobetrimed) {
     size_t start = s.find_first_not_of(tobetrimed);
@@ -164,8 +171,11 @@ std::string getTopicMessage(Client * client, std::vector<std::string> & input) {
 std::string getInviteMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
-    res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-              + " INVITE " + input[1] + " " + input[2]; 
+    // res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
+    //           + " INVITE " + input[1] + " " + input[2]; 
+    // return (res);
+    
+    res = ":" + client->nickname + " " + "INVITE" + " " + input[1] + " " + input[2]; 
     return (res);
 }
 
@@ -189,7 +199,7 @@ std::string getModeMessageTwo(Client * client, std::string chname , std::string 
     std::string res;
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-              + " MODE "  + chname  + " :[ " + input + " ]"; 
+              + " MODE "  + chname  + " :" + input; 
     return (res);
 }
 
