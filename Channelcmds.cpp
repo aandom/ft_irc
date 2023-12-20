@@ -108,7 +108,9 @@ void joinUtil(Server &server, Client *client, std::vector<std::string> &input) {
     status = checkChInput(input, 2);
     if (status) {
         // serverReply(std::to_string(status), getErrmsg(status, server), client);
-        serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
+        // serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
+        serverReply(intToStr(status), chname + " :" + getErrmsg(status, server), client);
+        // serverReply(intToStr(status), getErrmsg(status, server) + " :" + chname , client);
         throw std::invalid_argument(getErrmsg(status, server));
     }
     channel = server.getChannelIfExist(input[1]);
@@ -120,7 +122,9 @@ void joinUtil(Server &server, Client *client, std::vector<std::string> &input) {
     status = checkModes(channel, client, input, 'i');
     if (status) {
         // serverReply(std::to_string(status), getErrmsg(status, server), client);
-        serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
+        // serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
+        // serverReplyofChannel(intToStr(status), " " + getErrmsg(status, server), " " + chname, client);
+        serverReplyofChannelsec(intToStr(status), " " + client->nickname + " " + chname + " :" + getErrmsg(status, server), client);
         throw std::invalid_argument(getErrmsg(status, server));
     }
     if (channel->checkIfMember(client->nickname))

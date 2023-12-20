@@ -21,7 +21,12 @@ void serverReply(std::string code, std::string message, Client *client)
 
 void serverReplyofChannel(std::string code, std::string chname ,std::string message, Client *client)
 {
-	sendResponse1(":" + client->servername + " " + code + " " + chname + "" + message, client);
+	sendResponse1(":" + client->servername + " " + code + " " + chname + " " + message, client);
+}
+
+void serverReplyofChannelsec(std::string code, std::string message, Client *client)
+{
+	sendResponse1(":" + client->servername + " " + code + "" + message + " ", client);
 }
 
 std::vector<std::string> tokenizeMessage(std::string str) {

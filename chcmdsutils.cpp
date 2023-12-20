@@ -25,7 +25,7 @@ std::string intToStr(int nbr) {
     tmp << nbr;      
     std::string str;          
     tmp >> str;
-    return ( " " + str + " "); 
+    return ( "" + str + ""); 
 }
 
 static std::string leftTrim(const std::string &s, const std::string tobetrimed) {

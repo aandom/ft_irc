@@ -58,7 +58,7 @@
 #define ERR_PASSWDMISMATCH_MSG ":Password incorrect"
 #define ERR_CHANNELISFULL_MSG " :Cannot join channel (+l)"
 #define ERR_UNKNOWNMODE_MSG " :is unknown mode char to me"
-#define ERR_INVITEONLYCHAN_MSG " :Cannot join channel (+i)"
+#define ERR_INVITEONLYCHAN_MSG "Cannot join channel (+i)"
 #define ERR_BADCHANNELKEY_MSG " :Cannot join channel (+k)"
 #define ERR_BADCHANMASK_MSG " 476 "
 #define ERR_NOPRIVILEGES_MSG " :Permission Denied- You're not an IRC operator"
