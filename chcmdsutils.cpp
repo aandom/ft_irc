@@ -46,10 +46,9 @@ std::string trimChars(std::string str, const std::string tobetrimed) {
 std::vector<std::string> splitStringTwo(std::string str, char delim) {
     std::vector<std::string> res;
     std::string token = "";
+    bool flag = true;
     for (size_t i = 0; i < str.size(); i++) {
-        bool flag = true;
-        if (str[i] != delim ) 
-            flag = false;
+        flag = (str[i] != delim) ? false : true;
         if (flag) {
             if (token.size() > 0) {
                 res.push_back(token);
@@ -81,18 +80,15 @@ int checkChannelName(std::string & chname, int *status) {
 }
 
 int checkChInput(std::vector<std::string> & input, size_t minpars) {
-    int status;
-    
+    int status = 0; 
+
     if (input.size() < minpars)
         return (461); // Invalid number of parameters
     if (minpars == 3 && input[0] == "INVITE")
         checkChannelName(input[2], &status);
-    else if (checkChannelName(input[1], &status))
-    {
-        std::cout << "[ " << input[1] << " - " << status << " ]" << std::endl;
-        return (status); // bad channel name
-    }
-    return (0); 
+    else
+        checkChannelName(input[1], &status);
+    return (status); 
 }
 
 int checkModes(Channel * channel, Client * client, std::vector<std::string> & input, char checkfor) {
@@ -226,6 +222,18 @@ void    sendMessage(std::string const &msg, Channel * channel) {
       // send the message to the client;
       Client * newcl = *it;
       sendResponse(msg, newcl);
+    //   sendMsg((*it)->fd, msg);
+    }
+}
+void    sendMessageTwo(std::string const &msg, Channel * channel, Client *sender) {
+    std::vector<Client *> members = channel->getMembers();
+    
+    std::vector<Client *>::iterator it = members.begin();
+
+    for (; it != members.end(); ++it) {
+      // send the message to the client;
+      Client * newcl = *it;
+      UserToUserMessage(msg, sender , newcl);
     //   sendMsg((*it)->fd, msg);
     }
 }

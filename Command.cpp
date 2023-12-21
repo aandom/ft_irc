@@ -1,13 +1,25 @@
 #include "includes/Command.hpp"
 
-m_func Command::chcmd[6] = { join, part, topic, invite, kick, names};
-std::string Command::cmds[6] = {"JOIN", "PART", "TOPIC", "INVITE", "KICK", "NAMES"};
 
 Command::Command(Server *server, Client *client, std::string str, int i) {
 	this->server = server;
 	this->client = client;
 	this->str = str;
 	this->i = i;
+
+	chancmds["JOIN"]   = join;
+	chancmds["PART"]   = part;
+	chancmds["TOPIC"]  = topic;
+	chancmds["INVITE"] = invite;
+	chancmds["KICK"]   = kick;
+	chancmds["NAMES"]  = names;
+
+	clcmds["PING"]    = &Command::pingCommand;
+	clcmds["NICK"]    = &Command::NickCommand;
+	clcmds["QUIT"]    = &Command::quitCommand;
+	clcmds["OPER"]    = &Command::operCommand;
+	clcmds["PRIVMSG"] = &Command::PrivmsgCommand;
+	clcmds["WHOIS"]   = &Command::whoisCommand;
 }
 
 Command::t_command Command::r_commands[] = {
@@ -103,6 +115,7 @@ void Command::pingCommand() {
 }
 
 void Command::operCommand() {
+	std::cout << "here2" << std::endl;
 	if (tokens.size() == 3) {
 		if (tokens[2] == server->operator_password && tokens[1] == client->hostname) {
 			client->is_operator = true;
@@ -124,6 +137,8 @@ void Command::PrivmsgCommand() {
 			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 				UserToUserMessage(message, client, it->second);
 		}
+		else if (target[0] == '#')
+			privMsgchannel(*server, client, tokens);
 		else if (std::strchr(target.c_str(), ','))
 		{
 			std::vector<std::string> targets = splitString(target, ',');
@@ -249,62 +264,12 @@ void Command::executeCommand() {
 	}
 	else 
 	{
-		if (this->command == "PING")
-			pingCommand();
-		else if (this->command == "NICK")
-			NickCommand();
-		else if (this->command == "QUIT")
-			quitCommand();
-		else if (this->command == "OPER")
-			operCommand();
-		else if (this->command == "PRIVMSG")
-			PrivmsgCommand();
-		else if (this->command == "WHOIS")
-			whoisCommand();
-		else if (this->command == "JOIN") {
-			try {
-				join(*this->server, this->client, this->tokens);
-			} catch (std::exception &e) {
-				std::cout << e.what() << std::endl;
-			}
+		if (clcmds.find(this->command) != clcmds.end()){
+			cl_func tobecalled =  clcmds[this->command];
+			(this->*tobecalled)();
 		}
-		else if (this->command == "PART") {
-			try {
-				part(*this->server, this->client, this->tokens);
-			} catch (std::exception &e) {
-				std::cout << e.what() << std::endl;
-			}
-		}
-		else if (this->command == "TOPIC") {
-			try {
-				topic(*this->server, this->client, this->tokens);
-			} catch (std::exception &e) {
-				std::cout << e.what() << std::endl;
-			}
-		}
-		else if (this->command == "INVITE") {
-			try {
-				invite(*this->server, this->client, this->tokens);
-			} catch (std::exception &e) {
-				std::cout << e.what() << std::endl;
-			}
-		}
-		else if (this->command == "KICK") {
-			try {
-				kick(*this->server, this->client, this->tokens);
-			} catch (std::exception &e) {
-				std::cout << e.what() << std::endl;
-			}
-		}
-		else if (this->command == "NAMES") {
-			try {
-				names(*this->server, this->client, this->tokens);
-			} catch (std::exception &e) {
-				std::cout << e.what() << std::endl;
-			}
-		}
-		else if (this->command == "MODE") {
-			modeCommand();
+		else if (chancmds.find(this->command) != chancmds.end()){
+			(chancmds[this->command])(*this->server, this->client, this->tokens);
 		}
 		else if (this->command == "MOTD")
 			motdCommand();

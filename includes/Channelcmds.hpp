@@ -48,6 +48,7 @@ std::string getPartMessage(Client * client, std::vector<std::string> & input);
 std::string getTopicMessage(Client * client, std::vector<std::string> & input);
 std::string getInviteMessage(Client * client, std::vector<std::string> & input);
 void    sendMessage(std::string const &msg, Channel * channel);
+void    sendMessageTwo(std::string const &msg, Channel * channel, Client *sender);
 std::string getReason(std::vector<std::string> & input);
 std::string getKickMessage(Client * client, std::vector<std::string> & input);
 std::string getModeMessage(Client * client, std::vector<std::string> & input);

@@ -30,14 +30,15 @@ void namesUtils(Server &server, Client *client, std::vector<std::string> &input)
         chname = input[1];
     status = checkChInput(input, 2);
     if (status) {
-        // serverReply(std::to_string(status), getErrmsg(status, server), client);
-        serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
-        throw std::invalid_argument(getErrmsg(status, server));
+        serverReply(intToStr(status), chname + getErrmsg(status, server), client);
+        // throw std::invalid_argument(getErrmsg(status, server));
     }
     channel = server.getChannelIfExist(input[1]);
     if (channel == NULL) {
-        serverReplyofChannel("403", chname, getErrmsg(403, server), client);
-        throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
+        // serverReplyofChannel(" 403 ", chname, getErrmsg(403, server), client);
+        serverReply(" 403 ", chname + getErrmsg(403, server), client);
+        return ;
+        // throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
     }
     sendTopicAndMembers(channel, client, 1);
     // send all three messages to client;
@@ -53,24 +54,15 @@ void names(Server &server, Client *client, std::vector<std::string> &input) {
         while (i < chanames.size()) {
             finalinput.push_back("NAMES");
             finalinput.push_back(chanames[i]);
-            try {
-                namesUtils(server, client, finalinput);
-            } catch(const std::exception& e) {
-                std::cerr << e.what() << '\n';
-            }
+            namesUtils(server, client, finalinput);
             popElementsOfVector(finalinput);
             i++;
-        }   
-    }
-    else
-    {
-        try {
-            namesUtils(server, client, input);
-        } catch(const std::exception& e) {
-            std::cerr << e.what() << '\n';
         }
     }
-
+    else {
+        std::cout << "entering else part here \n" << std::endl;
+        namesUtils(server, client, input);
+    }
 }
 
 
@@ -92,7 +84,8 @@ void privMsgchannel(Server &server, Client *client, std::vector<std::string> &in
 		msg.append(*it + " ");
     }
     // printchannelmembers(channel);
-    sendMessage(msg, channel);
+    // sendMessage(msg, channel);
+    sendMessageTwo(msg, channel, client);
 }
 
 
@@ -107,10 +100,7 @@ void joinUtil(Server &server, Client *client, std::vector<std::string> &input) {
         chname = input[1];
     status = checkChInput(input, 2);
     if (status) {
-        // serverReply(std::to_string(status), getErrmsg(status, server), client);
-        // serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
-        serverReply(intToStr(status), chname + " :" + getErrmsg(status, server), client);
-        // serverReply(intToStr(status), getErrmsg(status, server) + " :" + chname , client);
+        serverReply(intToStr(status), chname + getErrmsg(status, server), client);
         throw std::invalid_argument(getErrmsg(status, server));
     }
     channel = server.getChannelIfExist(input[1]);
@@ -121,9 +111,6 @@ void joinUtil(Server &server, Client *client, std::vector<std::string> &input) {
     }
     status = checkModes(channel, client, input, 'i');
     if (status) {
-        // serverReply(std::to_string(status), getErrmsg(status, server), client);
-        // serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
-        // serverReplyofChannel(intToStr(status), " " + getErrmsg(status, server), " " + chname, client);
         serverReplyofChannelsec(intToStr(status), " " + client->nickname + " " + chname + " :" + getErrmsg(status, server), client);
         throw std::invalid_argument(getErrmsg(status, server));
     }
@@ -253,8 +240,7 @@ void topic(Server &server, Client *client, std::vector<std::string> &input) {
         throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
     }
 	if (!channel->checkIfMember(client->nickname)) {
-    
-        serverReplyofChannel(" 442 ", chname, getErrmsg(442, server), client);
+        serverReplyofChannelsec(" 442 ", " " + client->nickname + " " + chname + getErrmsg(442, server), client);
 		throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
     }
 	if (input.size() == 2 && channel->getTopic().size() > 0) {
@@ -263,7 +249,8 @@ void topic(Server &server, Client *client, std::vector<std::string> &input) {
 	}
     status = checkModes(channel, client, input, 't');
     if (status) {
-        serverReplyofChannel(" 482 ", chname, getErrmsg(482, server), client);
+        // serverReplyofChannel(" 482 ", chname, getErrmsg(482, server), client);
+        serverReplyofChannelsec(" " + intToStr(status) + " ", " " + client->nickname + " " + chname + getErrmsg(status, server), client);
 		throw std::invalid_argument(ERR_CHANOPRIVSNEEDED_MSG);
     }
 	if (input.size() == 2 && channel->getTopic().size() == 0)

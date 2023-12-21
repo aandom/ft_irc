@@ -20,6 +20,7 @@ private:
 	};
 
 public:
+	typedef void (Command::*cl_func)();
 	std::vector<std::string> 	tokens;
 	std::string					command;
 	std::string					str;
@@ -29,9 +30,9 @@ public:
 	~Command();
 	Command(Command const &src);
 	Command &operator=(Command const &src);
+	std::map<std::string, m_func> chancmds;
+	std::map<std::string, cl_func> clcmds;
 
-	static m_func chcmd[6];
-	static std::string cmds[6];
 
 	void 						parse_command();
 	void 						executeCommand();
