@@ -167,7 +167,7 @@ void partUtil(Server &server, Client *client, std::vector<std::string> &input) {
         chname = input[1];
     status = checkChInput(input, 2);
     if (status) {
-        // serverReply(std::to_string(status), getErrmsg(status, server), client);
+        // serverReply(intToStr(status), getErrmsg(status, server), client);
         serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
         throw std::invalid_argument(getErrmsg(status, server));
     }
@@ -590,8 +590,9 @@ void mode(Server &server, Client *client, std::vector<std::string> &input) {
         serverReplyofChannel(" 442 ", chname, getErrmsg(442, server), client);
 		throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
     }
-    if (input.size() == 2)
+    if (input.size() == 2) {
         return (serverReply(" 324 ", chname + " " + getMofchannel(channel), client));
+    }
 	if (!channel->isOperator(client)){
         serverReply(" 482 ", getErrmsg(482, server), client);
 		throw std::invalid_argument((ERR_CHANOPRIVSNEEDED_MSG));

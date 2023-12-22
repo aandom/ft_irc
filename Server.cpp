@@ -61,7 +61,7 @@ void Server::init_server_address() {
     hints.ai_flags = AI_PASSIVE;
     hints.ai_protocol = IPPROTO_TCP;
 
-    if (getaddrinfo(NULL, std::to_string(this->port).c_str(), &hints, &this->address) != 0)
+    if (getaddrinfo(NULL, intToStr(this->port).c_str(), &hints, &this->address) != 0)
         init_error("getaddrinfo() failed");
 }
 

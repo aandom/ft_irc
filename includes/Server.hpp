@@ -15,7 +15,6 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <netdb.h>
-#define _GNU_SOURCE
 #include <poll.h>
 #include <vector>
 #include <map>
@@ -28,6 +27,7 @@
 #include "Channel.hpp"
 #include "Channelcmds.hpp"
 #include "servError.hpp"
+#include <cstdio>
 
 #define TRUE             1
 #define FALSE            0

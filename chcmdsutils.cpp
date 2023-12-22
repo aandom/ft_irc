@@ -136,8 +136,9 @@ std::string getNewTopic(std::vector<std::string> & input) {
 
 std::string getReason(std::vector<std::string> & input) {
     std::string reason = "";
-    if (input.size() < 4)
+    if (input.size() < 4) {
         return (reason);
+    }
 	for (std::vector<std::string>::iterator it = input.begin() + 3; it != input.end(); it++)
 		reason.append(*it + " ");
 	if (reason.at(0) != ':')
@@ -167,10 +168,6 @@ std::string getTopicMessage(Client * client, std::vector<std::string> & input) {
 std::string getInviteMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
-    // res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-    //           + " INVITE " + input[1] + " " + input[2]; 
-    // return (res);
-    
     res = ":" + client->nickname + " " + "INVITE" + " " + input[1] + " " + input[2]; 
     return (res);
 }
@@ -225,6 +222,17 @@ void    sendMessage(std::string const &msg, Channel * channel) {
     //   sendMsg((*it)->fd, msg);
     }
 }
+
+void UserToUserMessageChannel(std::string message, Client *src, Client *dst, Channel *channel) {
+	std::string msg = ":" + src->nickname + "!" + src->username + "@" + src->hostname + " PRIVMSG ";
+	msg += channel->getChName() + " :" + message + "\r\n";
+	int rc = send(dst->fd, msg.c_str(), msg.length(), 0);
+	if (rc == -1) {
+		std::cout << "ERROR: " << strerror(errno) << std::endl;
+		return;
+	}
+}
+
 void    sendMessageTwo(std::string const &msg, Channel * channel, Client *sender) {
     std::vector<Client *> members = channel->getMembers();
     
@@ -233,7 +241,7 @@ void    sendMessageTwo(std::string const &msg, Channel * channel, Client *sender
     for (; it != members.end(); ++it) {
       // send the message to the client;
       Client * newcl = *it;
-      UserToUserMessage(msg, sender , newcl);
+      UserToUserMessageChannel(msg, sender , newcl, channel);
     //   sendMsg((*it)->fd, msg);
     }
 }
