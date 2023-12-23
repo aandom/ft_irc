@@ -10,8 +10,9 @@ void   sendTopicAndMembers(Channel *channel, Client *client, int isname) {
     }
     if (!isname)
         serverReply(" 332 ", topic, client);
-    serverReply(" 353 ", names, client);
-    serverReply(" 366 ",  channel->getChName() + " :END of /NAMES list", client); 
+    if (channel->checkIfMember(client->nickname))
+        serverReply(" 353 ", names, client);
+    serverReply(" 366 ",  channel->getChName() + " :END of /NAMES list.", client); 
 }
 
 void popElementsOfVector(std::vector<std::string> &input) {
@@ -81,10 +82,10 @@ void privMsgchannel(Server &server, Client *client, std::vector<std::string> &in
     if (!channel->checkIfMember(client->nickname))
         throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
     for (std::vector<std::string>::const_iterator it = input.begin() + 2; it != input.end(); it++) {
-		msg.append(*it + " ");
+        (it + 1) != input.end() ? msg.append(*it + " ") : msg.append(*it); 
+		// msg.append(*it + " ");
     }
-    // printchannelmembers(channel);
-    // sendMessage(msg, channel);
+    // msg.append(*(input.begin() + 2));
     sendMessageTwo(msg, channel, client);
 }
 
@@ -321,12 +322,13 @@ void kick(Server &server, Client *client, std::vector<std::string> &input) {
     std::string chname = "";
     std::string reason = "";
 
-    if (input.size() > 2)
-        chname = input[2];
+    if (input.size() > 1)
+        chname = input[1];
     status = checkChInput(input, 3);
     if (status) {
         serverReplyofChannel(intToStr(status), chname, getErrmsg(status, server), client);
-        throw std::invalid_argument(getErrmsg(status, server));
+        return ;
+        // throw std::invalid_argument(getErrmsg(status, server));
     }
     channel = server.getChannelIfExist(input[1]);
     if (channel == NULL) {
@@ -351,7 +353,7 @@ void kick(Server &server, Client *client, std::vector<std::string> &input) {
     }
     reason = getReason(input);
 	// send remove message to 
-    sendMessage(getKickMessage(client, input) + " :" + reason , channel);
+    sendMessage(getKickMessage(client, input) + " " + reason , channel);
 	channel->removeClient(toBeRemoved);
 	return ;
 

@@ -20,6 +20,7 @@ Command::Command(Server *server, Client *client, std::string str, int i) {
 	clcmds["OPER"]    = &Command::operCommand;
 	clcmds["PRIVMSG"] = &Command::PrivmsgCommand;
 	clcmds["WHOIS"]   = &Command::whoisCommand;
+	clcmds["MODE"]   = &Command::modeCommand;
 }
 
 Command::t_command Command::r_commands[] = {
@@ -93,12 +94,15 @@ void Command::PassCommand() {
 }
 
 void Command::UserCommand() {
+	static int i;
 	if (this->client->is_registered == true)
 		return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", this->client));
 	if (tokens.size() < 5)
 		return (serverReply(ERR_NEEDMOREPARAMS, "USER : Need more parameters", this->client));
 	if (this->client->is_authenticated == false)
 		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", this->client));
+	if (this->client->nickname.empty() && ++i)
+		client->nickname = "user_" + intToStr(i);
 	this->client->username = tokens[1];
 	this->client->servername = tokens[3];
 	this->client->realname = tokens[4];
@@ -264,17 +268,21 @@ void Command::executeCommand() {
 	}
 	else 
 	{
-		if (clcmds.find(this->command) != clcmds.end()){
-			cl_func tobecalled =  clcmds[this->command];
-			(this->*tobecalled)();
+		try {
+			if (clcmds.find(this->command) != clcmds.end()){
+				cl_func tobecalled =  clcmds[this->command];
+				(this->*tobecalled)();
+			}
+			else if (chancmds.find(this->command) != chancmds.end()){
+				(chancmds[this->command])(*this->server, this->client, this->tokens);
+			}
+			else if (this->command == "MOTD")
+				motdCommand();
+			else
+				serverReply(ERR_UNKNOWNCOMMAND, "unknown command after registration", client);
+		} catch (std::exception &e) {
+			std::cout << e.what() << std::endl;
 		}
-		else if (chancmds.find(this->command) != chancmds.end()){
-			(chancmds[this->command])(*this->server, this->client, this->tokens);
-		}
-		else if (this->command == "MOTD")
-			motdCommand();
-		else
-			serverReply(ERR_UNKNOWNCOMMAND, "unknown command after registration", client);
 	}
 }
 

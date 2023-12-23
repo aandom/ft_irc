@@ -140,7 +140,7 @@ std::string getReason(std::vector<std::string> & input) {
         return (reason);
     }
 	for (std::vector<std::string>::iterator it = input.begin() + 3; it != input.end(); it++)
-		reason.append(*it + " ");
+		(it + 1) != input.end() ? reason.append(*it + " ") : reason.append(*it);
 	if (reason.at(0) != ':')
 		reason.insert(0, ":");
 	// clear reason if only ":"
@@ -241,7 +241,9 @@ void    sendMessageTwo(std::string const &msg, Channel * channel, Client *sender
     for (; it != members.end(); ++it) {
       // send the message to the client;
       Client * newcl = *it;
-      UserToUserMessageChannel(msg, sender , newcl, channel);
+      if (newcl != sender) {
+        UserToUserMessageChannel(msg, sender , newcl, channel);
+      }
     //   sendMsg((*it)->fd, msg);
     }
 }

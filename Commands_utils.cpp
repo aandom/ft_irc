@@ -31,6 +31,7 @@ void serverReplyofChannelsec(std::string code, std::string message, Client *clie
 
 std::vector<std::string> tokenizeMessage(std::string str) {
     std::vector<std::string> tokens;
+	str = trimChars(str, "\r\n");
     std::istringstream iss(str);
     std::string token;
     
