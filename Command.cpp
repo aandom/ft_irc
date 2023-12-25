@@ -119,7 +119,6 @@ void Command::pingCommand() {
 }
 
 void Command::operCommand() {
-	std::cout << "here2" << std::endl;
 	if (tokens.size() == 3) {
 		if (tokens[2] == server->operator_password && tokens[1] == client->hostname) {
 			client->is_operator = true;

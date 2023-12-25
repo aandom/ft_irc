@@ -123,14 +123,20 @@ std::string getJoinMessage(Client * client, std::vector<std::string> & input) {
 
 std::string getNewTopic(std::vector<std::string> & input) {
     std::string new_topic = "";
-
-	for (std::vector<std::string>::iterator it = input.begin() + 2; it != input.end(); it++)
-		new_topic.append(*it + " ");
-	if (new_topic.at(0) != ':')
-		new_topic.insert(0, ":");
+    std::cout << "append [";
+	for (std::vector<std::string>::iterator it = input.begin() + 2; it != input.end(); it++) {
+        std::cout << *it << "-";
+		(it + 1) != input.end() ? new_topic.append(*it + " ") : new_topic.append(*it);
+    }
+    std::cout << "]" << std::endl;
+    if (new_topic.size() == 0)
+        return new_topic;
+    std::cout << "new_topic_0 [" << new_topic << "]" << std::endl;
+	// (new_topic.at(0) != ':') ? new_topic.insert(0, ":") : new_topic.insert(0, "");
 	// clear new_topic if only ":"
 	if (new_topic.size() == 1)
 		new_topic = "";
+    std::cout << "new_topic_1 [" << new_topic << "]" << std::endl;
     return (new_topic);
 }
 

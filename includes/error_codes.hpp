@@ -50,7 +50,7 @@
 #define ERR_NICKNAMEINUSE_MSG " :Nickname is already in use"
 #define ERR_NICKCOLLISON_MSG " :Nickname collision KILL"
 #define ERR_USERNOTINCHANNEL_MSG " :They aren't on that channel"
-#define ERR_NOTONCHANNEL_MSG " :You're not on that channel"
+#define ERR_NOTONCHANNEL_MSG " :You're not on that channel!"
 #define ERR_USERONCHANNEL_MSG " :is already on channel"
 #define ERR_NOTREGISTERED_MSG " :You have not registered"
 #define ERR_NEEDMOREPARAMS_MSG " :Not enough parameters"

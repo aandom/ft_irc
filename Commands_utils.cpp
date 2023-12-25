@@ -1,4 +1,5 @@
 #include "includes/Commands_utils.hpp"
+#include "includes/Channelcmds.hpp"
 
 void sendResponse(std::string message, Client *client) {
 	std::string response = message + "\r\n";
@@ -30,33 +31,63 @@ void serverReplyofChannelsec(std::string code, std::string message, Client *clie
 }
 
 std::vector<std::string> tokenizeMessage(std::string str) {
-    std::vector<std::string> tokens;
+    std::vector<std::string> result;
 	str = trimChars(str, "\r\n");
-    std::istringstream iss(str);
+    std::vector<std::string> tokens;
     std::string token;
-    
-    if (std::strchr(str.c_str(), ':')) 
-	{
-		std::vector<std::string> tokensBeforeColon;
-		while (getline(iss, token, ':')) {
-			tokensBeforeColon.push_back(token);
-		}
-		if (tokensBeforeColon.size() >= 2) {
-			std::istringstream issBeforeColon(tokensBeforeColon[0]);
-			while (issBeforeColon >> token) {
-				tokens.push_back(token);
-			}
-			tokens.push_back(tokensBeforeColon[1]);
-		} else
-			tokens.push_back(str);
-	}
-	else 
-	{
-		while (iss >> token)
+	std::string delimiter = " :";
+    size_t pos = 0;
+    size_t found;
+
+ 	found = str.find(delimiter, pos);
+	if (found != std::string::npos) {
+        result.push_back(str.substr(pos, found - pos));
+        pos = found + delimiter.length();
+    }
+    result.push_back(str.substr(pos));
+	if (result.size() >= 1) {
+		std::istringstream issBeforeColon(result[0]);
+		while (issBeforeColon >> token) {
 			tokens.push_back(token);
+		}
+		std::vector<std::string>::iterator it = result.begin();
+		while (++it != result.end())
+			tokens.push_back(*it);
 	}
-    return tokens;
+	return (tokens);
 }
+
+// std::vector<std::string> tokenizeMessage(std::string str) {
+//     std::vector<std::string> tokens;
+// 	str = trimChars(str, "\r\n");
+//     std::istringstream iss(str);
+//     std::string token;
+    
+//     if (std::strchr(str.c_str(), ':')) 
+// 	{
+// 		std::vector<std::string> tokensBeforeColon;
+// 		while (getline(iss, token, ':')) {
+// 			tokensBeforeColon.push_back(token);
+// 		}
+// 		if (tokensBeforeColon.size() >= 1) {
+// 			std::istringstream issBeforeColon(tokensBeforeColon[0]);
+// 			while (issBeforeColon >> token) {
+// 				tokens.push_back(token);
+// 			}
+// 			std::vector<std::string>::iterator it = tokensBeforeColon.begin();
+// 			while (++it != tokensBeforeColon.end())
+// 				tokens.push_back( ":" + *it);
+// 		} else
+// 			tokens.push_back(str);
+// 	}
+// 	else 
+// 	{
+// 		while (iss >> token)
+// 			tokens.push_back(token);
+// 	}
+// 	printVector(tokens);
+//     return tokens;
+// }
 
 bool isUniqueNickname(std::string nickname, std::map<int, Client *> clients, Client *client) {
 	if (clients.empty())
