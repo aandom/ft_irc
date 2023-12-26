@@ -342,11 +342,13 @@ void kick(Server &server, Client *client, std::vector<std::string> &input) {
     }
 
 	if (!channel->checkIfMember(client->nickname)) {
-        serverReplyofChannel(" 442 ", chname, getErrmsg(442, server), client);
+        // serverReplyofChannel(" 442 ", chname, getErrmsg(442, server), client);
+        serverReplyofChannelsec(" 442 ", " " + client->nickname + " " + input[1] + getErrmsg(442, server), client);
 		throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
     }
 	if (!channel->isOperator(client)){
-        serverReply(" 482 ", getErrmsg(482, server), client);
+        // serverReply(" 482 ", getErrmsg(482, server), client);
+        serverReplyofChannelsec(" 482 ", " " + client->nickname + " " + chname + getErrmsg(482, server), client);
 		throw std::invalid_argument((ERR_CHANOPRIVSNEEDED_MSG));
     }
 	// Check if user to kick exists on server and channel
@@ -374,21 +376,32 @@ int    tryExtractKeyMode(char sign, char m,  size_t & c, std::map<std::string, s
     if ((sign == '+' || sign == '-') && (m == 'k' && input.size() > c)) {
         if (sign == '+') {
             nmodes["+k"] = input[c];
-            c++;
         }
         else
-            nmodes["-k"] = "";
+            nmodes["-k"] = input[c];
+        c++;
+        return (1);
+    }
+    else if (sign == '-' && (m == 'k')) {
+        nmodes["-k"] = "";
         return (1);
     }
     return (0);
 }
 
-int    tryExtractOprMode(char sign, char m,  size_t & c, std::map<std::string, std::string> & nmodes, std::vector<std::string> &input) {
+int    tryExtractOprMode(char sign, char m,  size_t & c, std::map<std::string, t_val> & nmodes, std::vector<std::string> &input) {
+    t_val modepair;
     if ((sign == '+' || sign == '-') && (m == 'o' && input.size() > c)) {
-        if (sign == '+')
-            nmodes["+o"] = input[c];
-        else
-            nmodes["-o"] = input[c];
+        if (sign == '+') {
+            modepair.key = "+o";
+            // nmodes["+o"] = input[c];
+        }
+        else {
+            modepair.key = "-o";
+            // nmodes["-o"] = input[c];
+        }
+        modepair.value = input[c];
+        nmodes[intToStr(static_cast<int>(c))] = modepair;
         c++;
         return (1);
     }
@@ -439,50 +452,66 @@ void    recordMode(std::string &modes, char & sign, char newsign, std::string ne
 }
 
 
-int applyKeyMode(Channel *channel, std::string key, std::string value,  std::string & modes, char & sign) {
+int applyKeyMode(Channel *channel, std::string key, std::string value,  std::string & modes, std::string & values, char & sign) {
     if (key == "+k" && !channel->getmodeAt('k') && value != "") {
         channel->setMode('k', true);
         channel->setChKey(value);
+        values = values + " " + value;
         recordMode(modes, sign, '+', "k");
         return (1);
     }
+    else if (key == "-k" && channel->getmodeAt('k') && value == "") {
+        channel->setMode('k', false);
+        values = values + " " + channel->getChKey();
+        channel->setChKey("");
+        recordMode(modes, sign, '-', "k");
+        return (1);
+    }
     else if (key == "-k" && channel->getmodeAt('k') && value != "") {
+        if (value != channel->getChKey())
+            return (3);
         channel->setMode('k', false);
         channel->setChKey("");
+        values = values + " " + value;
         recordMode(modes, sign, '-', "k");
         return (1);
     }
     return (0);
 }
 
-int applyOprMode(Server &server, Channel *channel, std::string key, std::string nick, std::string & modes, char & sign) {
+int applyOprMode(Server &server, Channel *channel, std::string key, std::string nick, std::string & modes, std::string & values, char & sign) {
+    Client * newclient = server.getClientIfExist(nick);
+
+    if ((key == "+o" || key == "-o") &&  !newclient)
+        return(401);
     if (key == "+o" && (nick != "" && channel->checkIfMember(nick) && !channel->isNickIsAdmin(nick))) {
-        Client * newclient = server.getClientIfExist(nick);
         channel->addAdmin(newclient);
+        values = values + " " + nick;
         recordMode(modes, sign, '+', "o");
         return (1);
     }
     else if (key == "-o" && channel->checkIfMember(nick) && channel->isNickIsAdmin(nick)) {
-        Client * newclient = server.getClientIfExist(nick);
         channel->removeAddmin(newclient);
-        recordMode(modes, sign, '-', "o");
+        values = values + " " + nick;
+        recordMode(modes, sign,'-', "o");
         return (1);
     }
     return (0);
 }
 
-int applyLimitMode(Server &server, Channel *channel, std::string key, std::string limit, std::string &modes, char & sign) {
+int applyLimitMode(Server &server, Channel *channel, std::string key, std::string limit, std::string &modes, std::string & values, char & sign) {
     (void) server;
     if (key == "+l" && (limit != "")) {
         size_t value = static_cast<size_t>(std::strtoll((limit.c_str()), NULL, 10));
         channel->setMode('l', true);
         channel->setChLimit(value);
+        values = values + " " + intToStr(static_cast<int>(value));
         recordMode(modes, sign, '+', "l");
         return (1);
     }
     else if (key == "-l") {
         channel->setMode('l', false);
-        recordMode(modes, sign, '-', "l");
+        recordMode(modes, sign,'-', "l");
         return (1);
     }
     return (0);
@@ -522,30 +551,42 @@ int applyTopicMode(Server &server, Channel *channel, std::string key, std::strin
     return (0);
 }
 
-void tryApplyMode(Server &server, Client *client, Channel *channel, std::vector<std::string> &input, std::map<std::string, std::string>  nmodes) {
-    std::map<std::string, std::string>::iterator cit = nmodes.begin();
+
+void tryApplyMode(Server &server, Client *client, Channel *channel, std::vector<std::string> &input, std::map<std::string, t_val>  nmodes) {
+    std::map<std::string, t_val>::iterator cit = nmodes.begin();
     std::string appliedmode = "";
+    std::string values = "";
     char sign = 'n';
+    int res = 0;
     for (; cit != nmodes.end(); cit++) {
-        std::cout << cit->first << " - ";
-        if (applyKeyMode(channel, cit->first, cit->second, appliedmode, sign))
+        std::cout << cit->second.key << " - " << cit->second.value << std::endl;
+        if ((res = applyOprMode(server, channel, cit->second.key, cit->second.value, appliedmode, values, sign)) & 1) {
+            if (res > 1)
+                serverReplyofChannelsec(" " + intToStr(res) + " ", " " + client->nickname + " " + cit->second.value + getErrmsg(res, server), client);
             continue;
-        else if (applyOprMode(server, channel, cit->first, cit->second, appliedmode, sign))
-            continue;
-        else if (applyLimitMode(server, channel, cit->first, cit->second, appliedmode, sign))
-            continue;
-        else if (applyInviteMode(server, channel, cit->first, cit->second, appliedmode, sign))
-            continue;
-        else if (applyTopicMode(server, channel, cit->first, cit->second, appliedmode, sign))
-            continue;
+        }
+        // else if ((res = applyKeyMode(channel, cit->second.key, cit->second.value, appliedmode, values, sign)) & 1) {
+        //     if (res == 3)
+        //         serverReplyofChannelsec(ERR_KEYSET, " " + client->nickname + " " + channel->getChName() + getErrmsg(467, server), client);
+        //     continue;
+        // }
+        // else if (applyLimitMode(server, channel, cit->first, cit->second, appliedmode, values, sign))
+        //     continue;
+        // else if (applyInviteMode(server, channel, cit->first, cit->second, appliedmode, sign))
+        //     continue;
+        // else if (applyTopicMode(server, channel, cit->first, cit->second, appliedmode, sign))
+        //     continue;
     }
-    if (appliedmode.size() != 0)
+    if (appliedmode.size() != 0) {
+        appliedmode += " " + values;
         sendMessage(getModeMessageTwo(client, input[1], appliedmode), channel);
+    }
 }
 
 void modeUtils(Server &server, Client *client, Channel *channel, std::vector<std::string> &input) {
     std::string trimed = trimChars(input[2], " \n\r ");
-    std::map<std::string, std::string>  newmodes;
+    // std::map<std::string, std::string>  newmodes;
+    std::map<std::string, t_val>  newmodes;
     std::map<char, bool> chmode = channel->getMode();
     size_t  counter = 3;
     int     c = 0;
@@ -559,14 +600,15 @@ void modeUtils(Server &server, Client *client, Channel *channel, std::vector<std
             serverReplyofChannel(ERR_NEEDMOREPARAMS, channel->getChName() , getErrmsg(461, server), client);
         else if (sign == '+' && ((*it == 'k' || *it == 'l') && input.size() <= counter))
             serverReplyofChannel(ERR_NEEDMOREPARAMS, channel->getChName() , getErrmsg(461, server), client);
-        else if (tryExtractKeyMode(sign, *it, counter, newmodes, input))
+        else if (tryExtractOprMode(sign, *it, counter, newmodes, input)) {
             continue;
-        else if (tryExtractOprMode(sign, *it, counter, newmodes, input))
-            continue;
-        else if (tryExtractLimitMode(sign, *it, counter, newmodes, input))
-            continue;
-        else if (tryExtractOtherMode(sign, *it, chmode, newmodes))
-            continue;
+        // else if (tryExtractKeyMode(sign, *it, counter, newmodes, input))
+        //     continue;
+        // else if (tryExtractLimitMode(sign, *it, counter, newmodes, input))
+        //     continue;
+        // else if (tryExtractOtherMode(sign, *it, chmode, newmodes))
+        //     continue;
+        }
         else if ((*it == '+' || *it == '-') && c == 1)
             serverReplyofChannel(ERR_UNKNOWNMODE, channel->getChName() , getErrmsg(472, server), client);
         else if ((*it == '+' || *it == '-') && (c > 1 && *(it - 1) != '-' && *(it - 1) != '+'))
@@ -598,14 +640,16 @@ void mode(Server &server, Client *client, std::vector<std::string> &input) {
     }
 
 	if (!channel->checkIfMember(client->nickname)) {
-        serverReplyofChannel(" 442 ", chname, getErrmsg(442, server), client);
+        // serverReplyofChannel(" 442 ", chname, getErrmsg(442, server), client);
+        serverReplyofChannelsec(" 442 ", " " + client->nickname + " " + input[1] + getErrmsg(442, server), client);
 		throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
     }
     if (input.size() == 2) {
         return (serverReply(" 324 ", chname + " " + getMofchannel(channel), client));
     }
 	if (!channel->isOperator(client)){
-        serverReply(" 482 ", getErrmsg(482, server), client);
+        // serverReply(" 482 ", getErrmsg(482, server), client);
+        serverReplyofChannelsec(" 482 ", " " + client->nickname + " " + chname + getErrmsg(482, server), client);
 		throw std::invalid_argument((ERR_CHANOPRIVSNEEDED_MSG));
     }
     modeUtils(server, client, channel, input);

@@ -25,6 +25,7 @@ ErrorCode::ErrorCode() {
     _errmsgs [461] =  ERR_NEEDMOREPARAMS_MSG;
     _errmsgs [462] =  ERR_ALREADYREGISTERED_MSG;
     _errmsgs [464] =  ERR_PASSWDMISMATCH_MSG;
+    _errmsgs [467] =  ERR_KEYSET_MSG;
     _errmsgs [471] =  ERR_CHANNELISFULL_MSG;
     _errmsgs [472] =  ERR_UNKNOWNMODE_MSG;
     _errmsgs [473] =  ERR_INVITEONLYCHAN_MSG;

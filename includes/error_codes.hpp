@@ -34,6 +34,7 @@
 #define ERR_CHANOPRIVSNEEDED " 482 "
 #define ERR_UMODEUNKOWNFLAG " 501 "
 #define ERR_USERSDONTMATCH " 502 "
+#define ERR_KEYSET " 467 "
 
 
 #define ERR_NOSUCHNICK_MSG " :No such nick/channel"
@@ -68,4 +69,5 @@
 
 #define RPL_NOTOPIC_MSG " :No topic is set"
 #define RPL_INVITING_MSG " has been invited to "
+#define ERR_KEYSET_MSG " :Channel key already set"
 

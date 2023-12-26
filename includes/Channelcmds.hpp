@@ -23,10 +23,11 @@ class Server;
 class Client;
 class Channel;
 
-// typedef struct Channelcmds
-// {
-//     /* data */
-// };
+typedef struct s_val
+{
+    std::string key;
+    std::string value;
+} t_val;
 
 static std::string chcmds[8];
 
