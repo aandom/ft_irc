@@ -290,13 +290,16 @@ void invite(Server &server, Client *client, std::vector<std::string> &input) {
 
 	invitee = server.getClientIfExist(input[1]);
 	if (!invitee){
-        // serverReply(" 401 ", getErrmsg(401, server), client);
         serverReplyofChannelsec(" 401 ", " " + client->nickname + " " + input[1] + getErrmsg(401, server), client);
         throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
     }
+    if (!channel->checkIfMember(client->nickname)){
+        serverReplyofChannelsec(" 441 ", " " + client->nickname + " " + chname + getErrmsg(441, server), client);
+        throw std::invalid_argument(ERR_USERNOTINCHANNEL_MSG);
+    }
 	// Check if this client is an operator
 	if (!channel->isOperator(client)){
-        serverReply(" 482 ", getErrmsg(482, server), client);
+        serverReplyofChannelsec(" 482 ", " " + client->nickname + " " + chname + getErrmsg(482, server), client);
 		throw std::invalid_argument((ERR_CHANOPRIVSNEEDED_MSG));
     }
 	// Check if invitee is already in channel
