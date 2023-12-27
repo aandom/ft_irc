@@ -204,16 +204,21 @@ std::string getModeMessageTwo(Client * client, std::string chname , std::string 
 
 std::string getMofchannel(Channel * channel) {
     std::string res  = "+";
+    std::string values = "";
 
-    if (channel->getmodeAt('k'))
-        res += 'k';
     if (channel->getmodeAt('i'))
         res += 'i';
+    if (channel->getmodeAt('k')) {
+        res += 'k';
+        values = values + " " + channel->getChKey();
+    }
+    if (channel->getmodeAt('l')) {
+        res += 'l';
+        values = values + " " + intToStr(static_cast<int>(channel->getChLimit()));
+    }
     if (channel->getmodeAt('t'))
         res += 't';
-    if (channel->getmodeAt('l'))
-        res += 'l';
-    return (res);
+    return (res + values);
 }
 
 void    sendMessage(std::string const &msg, Channel * channel) {

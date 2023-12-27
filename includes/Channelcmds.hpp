@@ -29,6 +29,12 @@ typedef struct s_val
     std::string value;
 } t_val;
 
+typedef struct s_ctr
+{
+    size_t c;
+    size_t idx;
+} t_ctr;
+
 static std::string chcmds[8];
 
 
