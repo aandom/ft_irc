@@ -310,7 +310,7 @@ void invite(Server &server, Client *client, std::vector<std::string> &input) {
 
 	channel->addToInvitation(invitee);
     // serverReply(" 341 ",  ": " + invitee->nickname + getErrmsg(341, server) + channel->getChName(), client);
-    serverReply(" 341 ", invitee->nickname + " " + channel->getChName(), client);
+    serverReply(" 341 ", invitee->nickname + " " + channel->getChName() , client);
     // serverReply(" 341 ",   ": " + client->nickname + " Is inviting you to join the channel " + channel->getChName(), invitee);
     // serverReply(" 341 ", getInviteMessage(client, input), invitee);
     sendResponse1(getInviteMessage(client, input), invitee);

@@ -94,16 +94,16 @@ int checkChInput(std::vector<std::string> & input, size_t minpars) {
 int checkModes(Channel * channel, Client * client, std::vector<std::string> & input, char checkfor) {
     if (checkfor == 'i')
     {
-        if (channel->getmodeAt('i') && !channel->isInvited(client))
-            return (473);
         if (channel->getmodeAt('i') && channel->isInvited(client))
             return (0);
-        if (channel->getmodeAt('l') && (channel->getNickNames(0).size() >= channel->getChLimit()))
-            return (471);
         if ((channel->getmodeAt('k') && input.size() < 3))
             return (475);
         if ((channel->getmodeAt('k') && input.size() >= 3) && channel->getChKey().compare(input[2]))
             return (475);
+        if (channel->getmodeAt('i') && !channel->isInvited(client))
+            return (473);
+        if (channel->getmodeAt('l') && (channel->getNickNames(0).size() >= channel->getChLimit()))
+            return (471);
         
     }
     else if (checkfor == 't') {
@@ -174,7 +174,7 @@ std::string getTopicMessage(Client * client, std::vector<std::string> & input) {
 std::string getInviteMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
-    res = ":" + client->nickname + " " + "INVITE" + " " + input[1] + " " + input[2]; 
+    res = ":" + client->nickname + " " + "INVITE" + " " + input[1] + " " + input[2] + " :" + client->nickname + " is inviting you to join " + input[2]; 
     return (res);
 }
 
