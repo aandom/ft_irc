@@ -20,7 +20,9 @@ Command::Command(Server *server, Client *client, std::string str, int i) {
 	clcmds["OPER"]    = &Command::operCommand;
 	clcmds["PRIVMSG"] = &Command::PrivmsgCommand;
 	clcmds["WHOIS"]   = &Command::whoisCommand;
-	clcmds["MODE"]   = &Command::modeCommand;
+	clcmds["MODE"]    = &Command::modeCommand;
+	// **
+	clcmds ["KILL"]   = &Command::killCommand;
 }
 
 Command::t_command Command::r_commands[] = {
@@ -79,6 +81,11 @@ void Command::CapCommand() {
 			serverReply(ERR_UNKNOWNCOMMAND, "CAP : Unknown command", client);
 	} else
 			serverReply(ERR_NEEDMOREPARAMS, "CAP : Need more parameters", client);
+}
+
+// **
+void Command::killCommand() {
+	this->client->is_registered = false;
 }
 
 void Command::PassCommand() {
@@ -154,7 +161,7 @@ void Command::PrivmsgCommand() {
 				}
 			}
 		}
-		else 
+		else
 		{
 			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 			{
@@ -199,7 +206,7 @@ void Command::userMode() {
 			}
 			return;
 		}
-	}	
+	}
 	serverReply(ERR_NOSUCHNICK, "MODE :No such nick/channel", client);
 }
 
@@ -211,7 +218,7 @@ void Command::modeCommand() {
 		} catch(const std::exception& e) {
 			std::cerr << e.what() << '\n';
 		}
-			
+
 	}
 	else if (tokens.size() >= 3)
 		userMode();
@@ -232,7 +239,7 @@ void Command::quitCommand() {
 	sendResponse("QUIT :Bye bye", this->client);
 	server->clients.erase(client->fd);
 	close(client->fd);
-	this->server->fds[this->i].fd = -1;			
+	this->server->fds[this->i].fd = -1;
 	server->compress_array = true;
 }
 
@@ -265,7 +272,7 @@ void Command::executeCommand() {
 		}
 		return (serverReply(ERR_UNKNOWNCOMMAND, "unknown command before registration", client));
 	}
-	else 
+	else
 	{
 		try {
 			if (clcmds.find(this->command) != clcmds.end()){

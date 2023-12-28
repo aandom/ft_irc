@@ -13,7 +13,7 @@ class Command {
 private:
 	Server	*server;
 	Client	*client;
-	
+
 	struct t_command {
 		std::string name;
 		void (Command::*function)();
@@ -49,6 +49,8 @@ public:
 	void 						whoisCommand();
 	void						modeCommand();
 	void 						userMode();
+	// **
+	void						killCommand();
 	/*********************************Sending Message*******************************/
 	void						PrivmsgCommand();
 };
