@@ -40,7 +40,7 @@ class Server {
 		int					port;
 		int					new_sd;
 		int					rc;
-		char   				buffer[256];
+		char   				buffer[1024];
 		struct addrinfo		*address;
 		int				    timeout;
 		std::string			password;
@@ -92,6 +92,4 @@ class Server {
 
 	private:
 		std::vector<Channel *> _channels;
-
-
 };

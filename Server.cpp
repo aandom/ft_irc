@@ -166,7 +166,8 @@ void Server::read_client (int i) {
 	std::string str;
 	while (TRUE) 
 	{
-		this->rc = recv(this->fds[i].fd, this->buffer, sizeof(this->buffer), 0);
+		std::memset(buffer, 0, sizeof(buffer));
+		this->rc = recv(this->fds[i].fd, this->buffer, sizeof(this->buffer) - 2, 0);
 		if (this->rc < 0) {
 			if (errno != EWOULDBLOCK) {
 				perror("  recv() failed");
