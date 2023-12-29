@@ -140,12 +140,12 @@ std::string getNewTopic(std::vector<std::string> & input) {
     return (new_topic);
 }
 
-std::string getReason(std::vector<std::string> & input) {
+std::string getReason(std::vector<std::string> & input, size_t minpar) {
     std::string reason = "";
-    if (input.size() < 4) {
+    if (input.size() < minpar + 1) {
         return (reason);
     }
-	for (std::vector<std::string>::iterator it = input.begin() + 3; it != input.end(); it++)
+	for (std::vector<std::string>::iterator it = input.begin() + minpar; it != input.end(); it++)
 		(it + 1) != input.end() ? reason.append(*it + " ") : reason.append(*it);
 	if (reason.at(0) != ':')
 		reason.insert(0, ":");
@@ -154,6 +154,7 @@ std::string getReason(std::vector<std::string> & input) {
 		reason = "";
     return (reason);
 }
+
 
 std::string getPartMessage(Client * client, std::vector<std::string> & input) {
     std::string res;

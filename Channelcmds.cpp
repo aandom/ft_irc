@@ -36,7 +36,12 @@ void namesUtils(Server &server, Client *client, std::vector<std::string> &input)
     }
     channel = server.getChannelIfExist(input[1]);
     if (channel == NULL) {
-        // serverReplyofChannelsec(" 403 ", " " + client->nickname + " " + chname + getErrmsg(403, server), client);
+        serverReplyofChannelsec(" 403 ", " " + client->nickname + " " + chname + getErrmsg(403, server), client);
+        // serverReply(" 366 ",  chname + " :END of /NAMES list.", client); 
+        // throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
+        return ;
+    }
+    if (!channel->checkIfMember(client->nickname)) {
         serverReply(" 366 ",  chname + " :END of /NAMES list.", client); 
         // throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
         return ;
@@ -164,6 +169,10 @@ void join(Server &server, Client *client, std::vector<std::string> &input) {
     }
 }
 
+void removeChannelIfnoMember(Server &server, Channel *channel) {
+    if (channel->getMembers().size() == 0)
+        server.removeChannel(channel);
+}
 
 void partUtil(Server &server, Client *client, std::vector<std::string> &input) {
     Channel *channel = NULL;
@@ -186,11 +195,12 @@ void partUtil(Server &server, Client *client, std::vector<std::string> &input) {
         serverReplyofChannelsec(" 442 ", " " + client->nickname + " " + chname + getErrmsg(442, server), client);
 		throw std::invalid_argument(ERR_NOTONCHANNEL_MSG);
     }
-
+    std::string reason = getReason(input, 2);
     // build part message here
 	// send part message to all users of the channel
-    sendMessage(getPartMessage(client, input), channel);
+    sendMessage(getPartMessage(client, input) + " " + reason , channel);
 	channel->removeClient(client);
+    removeChannelIfnoMember(server, channel);
 	return ;
 
 }
@@ -199,12 +209,16 @@ void part(Server &server, Client *client, std::vector<std::string> &input) {
     size_t      i = 0;
     std::vector<std::string> chanames;
     std::vector<std::string>  finalinput;
+    std::string reason = "";
     if (input.size() > 1)
         chanames = splitStringTwo(input[1], ',');
+    if (input.size() > 2)
+        reason = input[2];
     if (chanames.size() > 1) {
         while (i < chanames.size()) {
             finalinput.push_back("PART");
             finalinput.push_back(chanames[i]);
+            finalinput.push_back(reason);
             try {
                 partUtil(server, client, finalinput);
             } catch(const std::exception& e) {
@@ -363,10 +377,11 @@ void kick(Server &server, Client *client, std::vector<std::string> &input) {
         serverReplyofChannelsec(" 441 ", " " + toBeRemoved->nickname + " " + chname + getErrmsg(441, server), client);
 		throw std::invalid_argument((ERR_USERNOTINCHANNEL_MSG));
     }
-    reason = getReason(input);
+    reason = getReason(input, 3);
 	// send remove message to 
     sendMessage(getKickMessage(client, input) + " " + reason , channel);
 	channel->removeClient(toBeRemoved);
+    removeChannelIfnoMember(server, channel);
 	return ;
 
 }
