@@ -50,19 +50,19 @@ Command &Command::operator=(Command const &src) {
 
 void Command::NickCommand() {
 	if (client->is_registered == true)
-		return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", client));
+		return (serverReply(ERR_ALREADYREGISTERED, "\033[31m You may not reregister", client));
 	if (client->is_authenticated == false)
-		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", client));
+		return (serverReply(ERR_PASSWDMISMATCH, "\033[31m You need to give a password first", client));
 	if (tokens.size() >= 2) {
 		std::string nickname = tokens[1];
 		std::cout << "nickname: " << nickname << std::endl;
 		if (!isUniqueNickname(nickname, this->server->clients, this->client)) {
-			serverReply(ERR_NICKNAMEINUSE, "Nickname is already in use", client);
+			serverReply(ERR_NICKNAMEINUSE, "\033[31m Nickname is already in use", client);
 		} else {
 			client->nickname = nickname;
 		}
 	} else
-		serverReply(ERR_NONICKNAMEGIVEN, "No nickname given", client);
+		serverReply(ERR_NONICKNAMEGIVEN, "\033[31m No nickname given", client);
 }
 
 void Command::CapCommand() {
@@ -78,36 +78,57 @@ void Command::CapCommand() {
 			sendResponse("CAP * ACK :multi-prefix userhost-in-names", this->client);
 		}
 		else
-			serverReply(ERR_UNKNOWNCOMMAND, "CAP : Unknown command", client);
+			serverReply(ERR_UNKNOWNCOMMAND, "\033[31m CAP : Unknown command", client);
 	} else
-			serverReply(ERR_NEEDMOREPARAMS, "CAP : Need more parameters", client);
+			serverReply(ERR_NEEDMOREPARAMS, "\033[31m CAP : Need more parameters", client);
 }
 
 // **
 void Command::killCommand() {
-	this->client->is_registered = false;
+	if (tokens.size() >= 3)
+	{
+		std::string message = "Closing Link: ircserv KILLED: " + tokens[1] + " by " + client->nickname + " because of " + tokens[2];
+		if (this->client->is_operator == true)
+		{
+			if (this->client->is_registered == true)
+			{
+				// send privmsg to killee
+				// "Closing Link: <servername> (Killed (<killer> (<reason>)))
+				sendResponse(message , this->client);
+				this->client->is_registered = false;
+			}
+			server->clients.erase(client->fd);
+			close(client->fd);
+			this->server->fds[this->i].fd = -1;
+			server->compress_array = true;
+		}
+		else
+			serverReply(ERR_NOPRIVILEGES ,ERR_NOPRIVILEGES_MSG,  client);
+	}
+	else
+		serverReply(ERR_NEEDMOREPARAMS, "\033[31m KILL : Need more parameters", client);
 }
 
 void Command::PassCommand() {
 	if (tokens.size() >= 2) {
 		if (client->is_registered == true)
-			return (serverReply(ERR_ALREADYREGISTERED, "You are already registered", client));
+			return (serverReply(ERR_ALREADYREGISTERED, "\033[31m You are already registered", client));
 		if (tokens[1] == server->password)
 			client->is_authenticated = true;
 		else
-			serverReply(ERR_PASSWDMISMATCH, "Password incorrect", client);
+			serverReply(ERR_PASSWDMISMATCH, "\033[31m Password incorrect", client);
 	} else
-		serverReply(ERR_NEEDMOREPARAMS, "PASS : Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, "\033[31m PASS : Need more parameters", client);
 }
 
 void Command::UserCommand() {
 	static int i;
 	if (this->client->is_registered == true)
-		return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", this->client));
+		return (serverReply(ERR_ALREADYREGISTERED, "\033[31m You may not reregister", this->client));
 	if (tokens.size() < 5)
-		return (serverReply(ERR_NEEDMOREPARAMS, "USER : Need more parameters", this->client));
+		return (serverReply(ERR_NEEDMOREPARAMS, "\033[31m USER : Need more parameters", this->client));
 	if (this->client->is_authenticated == false)
-		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", this->client));
+		return (serverReply(ERR_PASSWDMISMATCH, "\033[31m You need to give a password first", this->client));
 	if (this->client->nickname.empty() && ++i)
 		client->nickname = "user_" + intToStr(i);
 	this->client->username = tokens[1];
@@ -122,7 +143,7 @@ void Command::pingCommand() {
 	if (tokens.size() >= 2)
 		serverReply("PONG", ":" + client->hostname + " " + tokens[1], client);
 	else
-		serverReply(ERR_NEEDMOREPARAMS, "PING : Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, "\033[31m PING : Need more parameters", client);
 }
 
 void Command::operCommand() {
@@ -131,10 +152,10 @@ void Command::operCommand() {
 			client->is_operator = true;
 			serverReply(RPL_YOUREOPER, ":You are now an IRC operator", client);
 		} else
-			serverReply(ERR_PASSWDMISMATCH, "OPER : incorrect password or host", client);
+			serverReply(ERR_PASSWDMISMATCH, "\033[31m OPER : incorrect password or host", client);
 
 	} else
-		serverReply(ERR_NEEDMOREPARAMS, "OPER : Wrong Number of parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, "\033[31m OPER : Wrong Number of parameters", client);
 }
 
 void Command::PrivmsgCommand() {
@@ -170,11 +191,11 @@ void Command::PrivmsgCommand() {
 					return;
 				}
 			}
-			serverReply(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel", client);
+			serverReply(ERR_NOSUCHNICK, "\033[31m PRIVMSG :No such nick/channel", client);
 		}
 	}
 	else
-		serverReply(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, "\033[31m PRIVMSG :Need more parameters", client);
 }
 
 void Command::userMode() {
@@ -207,7 +228,7 @@ void Command::userMode() {
 			return;
 		}
 	}
-	serverReply(ERR_NOSUCHNICK, "MODE :No such nick/channel", client);
+	serverReply(ERR_NOSUCHNICK, "\033[31m MODE :No such nick/channel", client);
 }
 
 void Command::modeCommand() {
@@ -257,9 +278,9 @@ void Command::whoisCommand() {
 				return;
 			}
 		}
-		serverReply(ERR_NOSUCHNICK, "WHOIS :No such nick/channel", client);
+		serverReply(ERR_NOSUCHNICK, "\033[31m WHOIS :No such nick/channel", client);
 	} else {
-		serverReply(ERR_NEEDMOREPARAMS, "WHOIS :Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, "\033[31m WHOIS :Need more parameters", client);
 	}
 }
 
@@ -270,7 +291,7 @@ void Command::executeCommand() {
 			if (r_commands[i].name == this->command)
 				return (this->*r_commands[i].function)();
 		}
-		return (serverReply(ERR_UNKNOWNCOMMAND, "unknown command before registration", client));
+		return (serverReply(ERR_UNKNOWNCOMMAND, "\033[31m unknown command before registration", client));
 	}
 	else
 	{
@@ -285,7 +306,7 @@ void Command::executeCommand() {
 			else if (this->command == "MOTD")
 				motdCommand();
 			else
-				serverReply(ERR_UNKNOWNCOMMAND, "unknown command after registration", client);
+				serverReply(ERR_UNKNOWNCOMMAND, " \033[31m unknown command after registration", client);
 		} catch (std::exception &e) {
 			std::cout << e.what() << std::endl;
 		}
@@ -295,7 +316,7 @@ void Command::executeCommand() {
 void Command::parse_command() {
 	this->tokens = tokenizeMessage(this->str);
     if (this->tokens.empty()) {
-		serverReply(ERR_UNKNOWNCOMMAND, "Invalid message format", client);
+		serverReply(ERR_UNKNOWNCOMMAND, "\033[31m Invalid message format", client);
         return;
     }
     this->command = tokens[0];

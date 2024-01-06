@@ -5,14 +5,14 @@ void sendResponse(std::string message, Client *client) {
 	std::string response = message + "\r\n";
 	int ret = send(client->fd, response.c_str(), response.length(), 0);
 	if (ret == -1)
-		std::cout << "ERROR: " << strerror(errno) << std::endl;
+		std::cout << "\033[31m ERROR: " << strerror(errno) << std::endl;
 }
 
 void sendResponse1(std::string message, Client *client) {
 	std::string response = message + "\r\n";
 	int ret = send(client->fd, response.c_str(), response.length(), 0);
 	if (ret == -1)
-		std::cout << "ERROR: " << strerror(errno) << std::endl;
+		std::cout << "\033[31m ERROR: " << strerror(errno) << std::endl;
 }
 
 void serverReply(std::string code, std::string message, Client *client)
@@ -62,8 +62,8 @@ std::vector<std::string> tokenizeMessage(std::string str) {
 // 	str = trimChars(str, "\r\n");
 //     std::istringstream iss(str);
 //     std::string token;
-    
-//     if (std::strchr(str.c_str(), ':')) 
+
+//     if (std::strchr(str.c_str(), ':'))
 // 	{
 // 		std::vector<std::string> tokensBeforeColon;
 // 		while (getline(iss, token, ':')) {
@@ -80,7 +80,7 @@ std::vector<std::string> tokenizeMessage(std::string str) {
 // 		} else
 // 			tokens.push_back(str);
 // 	}
-// 	else 
+// 	else
 // 	{
 // 		while (iss >> token)
 // 			tokens.push_back(token);

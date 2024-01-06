@@ -11,3 +11,5 @@ int main (int argc, char *argv[])
 	server.main_loop();
 	return 0;
 }
+// Press Ctrl + Z to suspend the process.
+// You can list the suspended jobs with the jobs command, and then use the job number with the fg command to reverse suspension.
