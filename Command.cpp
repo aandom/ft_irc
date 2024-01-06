@@ -48,6 +48,7 @@ Command &Command::operator=(Command const &src) {
 	return *this;
 }
 
+// NICK <nickname>
 void Command::NickCommand() {
 	if (client->is_registered == true)
 		return (serverReply(ERR_ALREADYREGISTERED, "\033[31m You may not reregister", client));
@@ -83,7 +84,7 @@ void Command::CapCommand() {
 			serverReply(ERR_NEEDMOREPARAMS, "\033[31m CAP : Need more parameters", client);
 }
 
-// **
+// KILL <killee> <reasonto be killed>
 void Command::killCommand() {
 	if (tokens.size() >= 3)
 	{
@@ -109,6 +110,7 @@ void Command::killCommand() {
 		serverReply(ERR_NEEDMOREPARAMS, "\033[31m KILL : Need more parameters", client);
 }
 
+// PASS <password>
 void Command::PassCommand() {
 	if (tokens.size() >= 2) {
 		if (client->is_registered == true)
@@ -139,6 +141,7 @@ void Command::UserCommand() {
 	motdCommand();
 }
 
+// PING <any message>
 void Command::pingCommand() {
 	if (tokens.size() >= 2)
 		serverReply("PONG", ":" + client->hostname + " " + tokens[1], client);
@@ -146,6 +149,7 @@ void Command::pingCommand() {
 		serverReply(ERR_NEEDMOREPARAMS, "\033[31m PING : Need more parameters", client);
 }
 
+// OPER 127.0.0.1 pa$$word
 void Command::operCommand() {
 	if (tokens.size() == 3) {
 		if (tokens[2] == server->operator_password && tokens[1] == client->hostname) {
@@ -248,12 +252,12 @@ void Command::modeCommand() {
 }
 
 void Command::motdCommand() {
-	serverReply(RPL_MOTDSTART, ":- " + client->servername + " Message of the day - ", client);
+	serverReply(RPL_MOTDSTART, "\033[34m :- " + client->servername + " Message of the day - ", client);
 	serverReply(RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" +  \
 		client->username + "@" + client->hostname + "", client);
 	serverReply(RPL_MOTD, ":- This is a friendly community", client);
 	serverReply(RPL_MOTD, ":- This Ft_IRC server is made by: dsium, aandom, and zsyyida", client);
-	serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);
+	serverReply(RPL_ENDOFMOTD, ":End of MOTD command \033[30m", client);
 }
 
 void Command::quitCommand() {
