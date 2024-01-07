@@ -28,6 +28,7 @@
 #include "Channelcmds.hpp"
 #include "servError.hpp"
 #include <cstdio>
+#include <csignal>
 
 #define TRUE             1
 #define FALSE            0
@@ -46,7 +47,7 @@ class Server {
 		std::string			password;
 		std::string			operator_password;
 		struct pollfd		fds[200];
-		int					nfds;	
+		int					nfds;
 		int					on;
 		int					end_server;
 		bool				close_conn;
@@ -89,6 +90,7 @@ class Server {
 		ErrorCode _errors;
 		typedef std::vector<Channel *>::iterator ch_iterator;
 		typedef std::map<int, Client *>::iterator cl_iterator;
+		void signalHandler(int signal);
 
 	private:
 		std::vector<Channel *> _channels;

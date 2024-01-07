@@ -13,6 +13,8 @@ Server::Server(char *argv[]) {
 	this->close_conn = FALSE;
 	this->compress_array = FALSE;
 	this->operator_password = "pa$$word";
+	signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
 }
 
 Server::~Server() {
@@ -44,6 +46,15 @@ Server &Server::operator=(Server const &src) {
 		this->operator_password = src.operator_password;
 	}
 	return *this;
+}
+
+void Server::signalHandler(int signal)
+{
+	if(signal == SIGINT || signal == SIGTERM)
+	removeChannel(channel);
+	for (int i = 4; i < this->nfds; i++)
+		close_connection(i);
+
 }
 
 void Server::init_error(std::string error) {
@@ -175,6 +186,7 @@ void Server::read_client (int i) {
 			break;
 		}
 		str += this->buffer;
+		std::cout << this->buffer <<std::endl;
 		if (this->rc == 0) {
 			std::cout << "  Connection closed" << std::endl;
 			this->close_conn = TRUE;
