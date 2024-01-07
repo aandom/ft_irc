@@ -5,14 +5,14 @@ void sendResponse(std::string message, Client *client) {
 	std::string response = message + "\r\n";
 	int ret = send(client->fd, response.c_str(), response.length(), 0);
 	if (ret == -1)
-		std::cout << "\033[31m ERROR: " << strerror(errno) << std::endl;
+		std::cout << "\033[31m ERROR: " << strerror(errno) << "\033[30m" << std::endl;
 }
 
 void sendResponse1(std::string message, Client *client) {
 	std::string response = message + "\r\n";
 	int ret = send(client->fd, response.c_str(), response.length(), 0);
 	if (ret == -1)
-		std::cout << "\033[31m ERROR: " << strerror(errno) << std::endl;
+		std::cout << "\033[31m ERROR: " << strerror(errno) << "\033[30m" << std::endl;
 }
 
 void serverReply(std::string code, std::string message, Client *client)
@@ -103,11 +103,11 @@ bool isUniqueNickname(std::string nickname, std::map<int, Client *> clients, Cli
 }
 
 void registrationReply(Client *client) {
-	serverReply(RPL_WELCOME, ":Welcome to the Internet Relay Network " + client->nickname + "!" + client->username + "@" + client->hostname, client);
+	serverReply(RPL_WELCOME, "\033[34m :Welcome to the Internet Relay Network " + client->nickname + "!" + client->username + "@" + client->hostname, client);
 	serverReply(RPL_YOURHOST, ":Your host is " + client->hostname + ", running version 1.0", client);
 	serverReply(RPL_CREATED, ":This server was created sometime", client);
 	serverReply(RPL_MYINFO, ": " + client->hostname, client);
-	serverReply(RPL_ISUPPORT, "CHANMODES=,k,l,it MODES=2 MAXNICKLEN=16 NICKLEN=16 CHANNELLEN=50 :CHANTYPES=#&", client);
+	serverReply(RPL_ISUPPORT, "CHANMODES=,k,l,it MODES=2 MAXNICKLEN=16 NICKLEN=16 CHANNELLEN=50 :CHANTYPES=#& \033[30m", client);
 }
 
 void UserToUserMessage(std::string message, Client *src, Client *dst) {

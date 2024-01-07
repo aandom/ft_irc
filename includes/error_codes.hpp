@@ -66,6 +66,6 @@
 #define ERR_UMODEUNKOWNFLAG_MSG "\033[31m :Unknown MODE flag \033[30m"
 #define ERR_USERSDONTMATCH_MSG "\033[31m :Cant change mode for other users \033[30m"
 
-#define RPL_NOTOPIC_MSG "\033[31m :No topic is set"
-#define RPL_INVITING_MSG "\033[31m has been invited to "
+#define RPL_NOTOPIC_MSG "\033[31m :No topic is set \033[30m"
+#define RPL_INVITING_MSG "\033[31m has been invited to \033[30m"
 

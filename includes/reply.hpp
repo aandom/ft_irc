@@ -1,6 +1,6 @@
 #pragma once
 
-#define RPL_WELCOME			" 001 "
+#define RPL_WELCOME			"\033[34m 001 "
 #define RPL_YOURHOST		" 002 "
 #define RPL_CREATED 		" 003 "
 #define RPL_MYINFO 			" 004 "
@@ -19,7 +19,7 @@
 #define RPL_NAMREPLY 		" 353 "
 #define RPL_ENDOFNAMES 		" 366 "
 #define RPL_MOTD 			" 372 "
-#define RPL_MOTDSTART 		" 375 "
+#define RPL_MOTDSTART 		"\033[35m 375 "
 #define RPL_ENDOFMOTD 		" 376 "
 #define RPL_WHOISHOST 		" 378 "
 #define RPL_YOUREOPER 		" 381 "
