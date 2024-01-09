@@ -9,20 +9,23 @@ Server::Server(char *argv[]) {
 	this->password = argv[2];
 	this->nfds = 1;
 	this->on = 1;
-	this->end_server = FALSE;
+	end_server = FALSE;
 	this->close_conn = FALSE;
 	this->compress_array = FALSE;
 	this->operator_password = "pa$$word";
-	signal(SIGINT, signalHandler);
-    signal(SIGTERM, signalHandler);
 }
 
 Server::~Server() {
 	for (int i = 0; i < this->nfds; i++)
 	{
 		if(this->fds[i].fd >= 0)
-			close(this->fds[i].fd);
+			close_connection(this->fds[i].fd);
+		// 	close(this->fds[i].fd);
 	}
+	std::cout << "closing socket\n";
+	close(this->socket_fd);
+	// clear fd, client, channel, 
+	// what about command objects?
 }
 
 Server::Server(Server const &src) {
@@ -40,21 +43,12 @@ Server &Server::operator=(Server const &src) {
 		this->password = src.password;
 		this->nfds = src.nfds;
 		this->on = src.on;
-		this->end_server = src.end_server;
+		// this->end_server = src.end_server;
 		this->close_conn = src.close_conn;
 		this->compress_array = src.compress_array;
 		this->operator_password = src.operator_password;
 	}
 	return *this;
-}
-
-void Server::signalHandler(int signal)
-{
-	if(signal == SIGINT || signal == SIGTERM)
-	removeChannel(channel);
-	for (int i = 4; i < this->nfds; i++)
-		close_connection(i);
-
 }
 
 void Server::init_error(std::string error) {
@@ -129,11 +123,11 @@ void Server::ft_poll() {
 	this->rc = poll(this->fds, this->nfds, -1);
 	if (this->rc < 0)	{
 		perror("\033[31m poll() failed \033[30m");
-		this->end_server = TRUE;
+		end_server = TRUE;
 	}
 	if (this->rc == 0) {
 		std::cout << "\033[31m poll() timed out.  End program. \033[30m" << std::endl;
-		this->end_server = TRUE;
+		end_server = TRUE;
 	}
 }
 
@@ -158,7 +152,7 @@ void Server::accept_client () {
 		if (this->new_sd < 0) {
 			if (errno != EWOULDBLOCK) {
 				perror("\033[31m accept() failed \033[30m");
-				this->end_server = TRUE;
+				end_server = TRUE;
 			}
 			return;
 		}
@@ -326,3 +320,10 @@ bool	Server::checkIfClientExists(std::string const & cname) {
         return(true);
     return (false);
 }
+
+// void Server::signalHandler(int signal)
+// {
+// 	std::cout << "\033[31m Interrupt signal (" << signal << ") received. \033[30m \n";
+// 	end_server = TRUE;
+// 	exit(signal);
+// }

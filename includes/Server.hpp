@@ -90,7 +90,7 @@ class Server {
 		ErrorCode _errors;
 		typedef std::vector<Channel *>::iterator ch_iterator;
 		typedef std::map<int, Client *>::iterator cl_iterator;
-		void signalHandler(int signal);
+		// static void signalHandler(int signal);
 
 	private:
 		std::vector<Channel *> _channels;

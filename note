@@ -2,4 +2,6 @@ authenticated before using NICK cmd ✅
 implement whois command ✅
 implement userMode command
 
+?? do we need to handle ctrl + c in client seperately??
+?? we need to handle much more in server destructor??
 modern.ircdocs.horse
