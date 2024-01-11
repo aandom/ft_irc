@@ -120,7 +120,7 @@ void UserToUserMessage(std::string message, Client *src, Client *dst) {
 	}
 }
 
-std::vector<std::string> splitString(const std::string& input, char delimiter) {
+std::vector<std::string>  splitString(const std::string& input, char delimiter) {
     std::vector<std::string> tokens;
     std::istringstream tokenStream(input);
     std::string token;

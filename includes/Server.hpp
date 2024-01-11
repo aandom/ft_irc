@@ -90,9 +90,9 @@ class Server {
 		ErrorCode _errors;
 		typedef std::vector<Channel *>::iterator ch_iterator;
 		typedef std::map<int, Client *>::iterator cl_iterator;
-		// static void signalHandler(int signal);
 
-	private:
+	private: 
+	// why is this private?
 		std::vector<Channel *> _channels;
 
 

@@ -84,31 +84,42 @@ void Command::CapCommand() {
 			serverReply(ERR_NEEDMOREPARAMS, "\033[31m CAP : Need more parameters \033[30m", client);
 }
 
-// KILL <killee> <reasonto be killed>
-// "Closing Link: <servername> (Killed (<killer> (<reason>))) for killee
-// "Killed (<killer> (<reason>))" for all chanels is member of
+// // KILL <killee> <reasonto be killed>
+// // "Closing Link: <servername> (Killed (<killer> (<reason>))) for killee
+// // "Killed (<killer> (<reason>))" for all chanels is member of
 void Command::killCommand() {
 	if (tokens.size() >= 3)
 	{
 		std::string reason = tokens[2];
-		std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
-		if (this->client->is_operator == true)
+		for (int i = 3; i < static_cast<int>(tokens.size()); i++)
 		{
-			if (this->client->is_registered == true)
+			reason += " ";
+			reason += tokens[i];
+		}
+		std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
+		if (this->client->is_operator && this->client->is_registered)
+		{
+			std::string reason = tokens[2];
+			for (int i = 3; i < static_cast<int>(tokens.size()); i++)
 			{
-				// std::vector<Client *> member = channel->getMembers();
-    			// std::vector<Client *>::iterator it = member.begin();
-    			// for(; it != member.end(); ++it) {
-				// 	if (channel->checkIfMember(tokens[1])
-				// 	{
-				// 		sendMessage(tokens[1] + " killed by " + client->nickname + "because of " + reason , channel);
-				// 		channel->removeClient(toBeRemoved);
-				// 	}
-				// }
-				// send privmsg to killee
-				sendResponse(message , this->client);
-				this->client->is_registered = false;
+				reason += " ";
+				reason += tokens[i];
 			}
+			// send message to others that share channel
+			std::vector<Channel *> channels = server->getChannels();
+			std::vector<Channel *>::iterator ch_iterator = channels.begin();
+			for(; ch_iterator != channels.end(); ++ch_iterator) 
+			{
+				if ((*ch_iterator)->checkIfMember(tokens[1]))
+				{
+					sendMessage(tokens[1] + " killed by " + client->nickname + "because of " + reason , (*ch_iterator));
+					(*ch_iterator)->removeClient(this->client);
+				}
+			}
+			// send msg to killee
+			std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
+			sendResponse(message , this->client);
+			this->client->is_registered = false;
 			server->clients.erase(client->fd);
 			close(client->fd);
 			this->server->fds[this->i].fd = -1;
@@ -316,16 +327,20 @@ void Command::executeCommand() {
 	{
 		try {
 			if (clcmds.find(this->command) != clcmds.end()){
+				// ***
+				// std::cout << clcmds[this->command]<<std::endl;
 				cl_func tobecalled =  clcmds[this->command];
 				(this->*tobecalled)();
 			}
 			else if (chancmds.find(this->command) != chancmds.end()){
+				// ***
+				// std::cout << chancmds[this->command]<<std::endl;
 				(chancmds[this->command])(*this->server, this->client, this->tokens);
 			}
 			else if (this->command == "MOTD")
 				motdCommand();
 			else
-				serverReply(ERR_UNKNOWNCOMMAND, " \033[31m unknown command after registration \033[30m", client);
+				serverReply(ERR_UNKNOWNCOMMAND, " \033[31m  unknown command after registration \033[30m", client);
 		} catch (std::exception &e) {
 			std::cout << e.what() << std::endl;
 		}

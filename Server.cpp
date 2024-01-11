@@ -320,10 +320,3 @@ bool	Server::checkIfClientExists(std::string const & cname) {
         return(true);
     return (false);
 }
-
-// void Server::signalHandler(int signal)
-// {
-// 	std::cout << "\033[31m Interrupt signal (" << signal << ") received. \033[30m \n";
-// 	end_server = TRUE;
-// 	exit(signal);
-// }
