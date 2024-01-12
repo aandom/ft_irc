@@ -17,7 +17,7 @@ Channel::Channel(std::string &name, std::string &key) : _chName(name),
                                                         _chLimit(0),
                                                         _topic("")
 {
-    _mode['k'] = false;
+    _mode['k'] = (key.size() == 0) ? false : true;
     _mode['i'] = false;
     _mode['t'] = false;
     _mode['l'] = false;

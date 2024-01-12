@@ -36,6 +36,8 @@ public:
 
 	void 						parse_command();
 	void 						executeCommand();
+	// void 						handleException(std::exception &e);
+	void 						handleException(std::string err);
 
 	/****************************** Connection Commands********************************/
 	void						CapCommand();

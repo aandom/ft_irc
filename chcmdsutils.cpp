@@ -69,26 +69,22 @@ std::string getErrmsg(int code, Server &server ) {
 }
 
 
-int checkChannelName(std::string & chname, int *status) {
+int checkChannelName(std::string & chname) {
     if (chname.find_first_of(" , :\n\r\a\0") != std::string::npos)
-        return (*status = 403, 2);
+        return (403);
     if (chname.size() > 50)
-        return (*status = 403, 3);
+        return (403);
     if (chname.at(0) != '#' || chname.size() < 2)
-        return(*status = 403, 4);
+        return(403);
     return (0);
 }
 
 int checkChInput(std::vector<std::string> & input, size_t minpars) {
-    int status = 0; 
-
     if (input.size() < minpars)
         return (461); // Invalid number of parameters
     if (minpars == 3 && input[0] == "INVITE")
-        checkChannelName(input[2], &status);
-    else
-        checkChannelName(input[1], &status);
-    return (status); 
+        return (checkChannelName(input[2]));
+    return(checkChannelName(input[1]));
 }
 
 int checkModes(Channel * channel, Client * client, std::vector<std::string> & input, char checkfor) {
@@ -123,15 +119,11 @@ std::string getJoinMessage(Client * client, std::vector<std::string> & input) {
 
 std::string getNewTopic(std::vector<std::string> & input) {
     std::string new_topic = "";
-    std::cout << "append [";
 	for (std::vector<std::string>::iterator it = input.begin() + 2; it != input.end(); it++) {
-        std::cout << *it << "-";
 		(it + 1) != input.end() ? new_topic.append(*it + " ") : new_topic.append(*it);
     }
-    std::cout << "]" << std::endl;
     if (new_topic.size() == 0)
         return new_topic;
-    std::cout << "new_topic_0 [" << new_topic << "]" << std::endl;
 	// (new_topic.at(0) != ':') ? new_topic.insert(0, ":") : new_topic.insert(0, "");
 	// clear new_topic if only ":"
 	if (new_topic.size() == 1)
@@ -142,9 +134,9 @@ std::string getNewTopic(std::vector<std::string> & input) {
 
 std::string getReason(std::vector<std::string> & input, size_t minpar) {
     std::string reason = "";
-    if (input.size() < minpar + 1) {
+
+    if (input.size() < minpar + 1)
         return (reason);
-    }
 	for (std::vector<std::string>::iterator it = input.begin() + minpar; it != input.end(); it++)
 		(it + 1) != input.end() ? reason.append(*it + " ") : reason.append(*it);
 	if (reason.at(0) != ':')
@@ -251,11 +243,8 @@ void    sendMessageTwo(std::string const &msg, Channel * channel, Client *sender
     std::vector<Client *>::iterator it = members.begin();
 
     for (; it != members.end(); ++it) {
-      // send the message to the client;
-      Client * newcl = *it;
-      if (newcl != sender) {
-        UserToUserMessageChannel(msg, sender , newcl, channel);
-      }
-    //   sendMsg((*it)->fd, msg);
+        Client * newcl = *it;
+        if (newcl != sender)
+            UserToUserMessageChannel(msg, sender , newcl, channel);
     }
 }
