@@ -160,7 +160,6 @@ void Server::accept_client () {
 	}
 }
 
-
 void Server::read_client (int i) {
 	this->close_conn = FALSE;
 	std::string str;
