@@ -1,6 +1,5 @@
 #include "includes/Command.hpp"
 
-
 Command::Command(Server *server, Client *client, std::string str, int i) {
 	this->server = server;
 	this->client = client;
@@ -30,6 +29,7 @@ Command::t_command Command::r_commands[] = {
 	{"NICK", &Command::NickCommand},
 	{"PASS", &Command::PassCommand},
 	{"USER", &Command::UserCommand},
+	{"JOIN", NULL},
 	{"", NULL},
 };
 
@@ -60,9 +60,16 @@ void Command::NickCommand() {
 			serverReply(ERR_NICKNAMEINUSE, "Nickname is already in use", client);
 		} else {
 			client->nickname = nickname;
+			if (!client->username.empty()) 
+			{
+				registrationReply(client);
+				client->is_registered = true;
+			}
+			
 		}
 	} else
 		serverReply(ERR_NONICKNAMEGIVEN, "No nickname given", client);
+	
 }
 
 void Command::CapCommand() {
@@ -141,6 +148,7 @@ void Command::PassCommand() {
 	if (tokens.size() >= 2) {
 		if (client->is_registered == true)
 			return (serverReply(ERR_ALREADYREGISTERED, "You are already registered", client));
+		tokens[1] = (tokens[1].at(0) == ':') ? tokens[1].substr(1) : tokens[1];
 		if (tokens[1] == server->password)
 			client->is_authenticated = true;
 		else
@@ -150,21 +158,20 @@ void Command::PassCommand() {
 }
 
 void Command::UserCommand() {
-	static int i;
 	if (this->client->is_registered == true)
 		return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", this->client));
 	if (tokens.size() < 5)
 		return (serverReply(ERR_NEEDMOREPARAMS, "USER : Need more parameters", this->client));
 	if (this->client->is_authenticated == false)
 		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", this->client));
-	if (this->client->nickname.empty() && ++i)
-		client->nickname = "user_" + intToStr(i);
 	this->client->username = tokens[1];
 	this->client->servername = tokens[3];
 	this->client->realname = tokens[4];
-	this->client->is_registered = true;
-	registrationReply(this->client);
-	motdCommand();
+	if (!this->client->nickname.empty()) 
+	{
+		this->client->is_registered = true;
+		registrationReply(client);
+	}
 }
 
 void Command::pingCommand() {
@@ -196,8 +203,13 @@ void Command::PrivmsgCommand() {
 			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 				UserToUserMessage(message, client, it->second);
 		}
-		else if (target[0] == '#')
-			privMsgchannel(*server, client, tokens);
+		else if (target[0] == '#') {
+			try {
+				privMsgchannel(*server, client, tokens);
+			} catch (std::exception &e) {
+				handleException(e.what());
+			}
+		}
 		else if (std::strchr(target.c_str(), ','))
 		{
 			std::vector<std::string> targets = splitString(target, ',');
@@ -227,7 +239,8 @@ void Command::PrivmsgCommand() {
 }
 
 void Command::userMode() {
-	std::string nickname = tokens[1];
+	std::vector<std::string> names = splitString(tokens[1], '!');
+	std::string nickname = names[0];
 	for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 	{
 		if (it->second->nickname == nickname) {
@@ -265,7 +278,7 @@ void Command::modeCommand() {
 		try {
 			mode(*this->server, this->client, this->tokens);
 		} catch(const std::exception& e) {
-			std::cerr << e.what() << '\n';
+			handleException(e.what());
 		}
 
 	}
@@ -312,12 +325,29 @@ void Command::whoisCommand() {
 	}
 }
 
+void Command::handleException(std::string err) {
+	std::string chname = "";
+	if (this->command == "INIVTE" && tokens.size() >= 3)
+		chname = tokens[2];
+	else if (err == "461") {
+		chname = this->command;
+	}
+	else
+		chname = tokens[1];
+	srvRplErr(err, chname, client, *server);
+}
+
 void Command::executeCommand() {
 	if (client->is_registered == false) {
 		for (int i = 0; !r_commands[i].name.empty(); i++)
 		{
 			if (r_commands[i].name == this->command)
-				return (this->*r_commands[i].function)();
+			{
+				if (r_commands[i].function == NULL)
+					return (serverReply(ERR_NEEDMOREPARAMS, "Need more parameters", client));
+				else
+					return (this->*r_commands[i].function)();
+			}
 		}
 		return (serverReply(ERR_UNKNOWNCOMMAND, "unknown command before registration", client));
 	}
@@ -336,7 +366,9 @@ void Command::executeCommand() {
 			else
 				serverReply(ERR_UNKNOWNCOMMAND, "unknown command after registration", client);
 		} catch (std::exception &e) {
-			std::cout << e.what() << std::endl;
+			// std::cout << "err = [" ;
+			// std::cout <<  e.what() << "]" << std::endl;
+			handleException(e.what());
 		}
 	}
 }

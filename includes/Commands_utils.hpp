@@ -3,6 +3,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Command.hpp"
+#include "Channelcmds.hpp"
 
 void 						sendResponse1(std::string message, Client *client);
 void 						serverReply(std::string code, std::string message, Client *client);
@@ -16,3 +17,4 @@ std::vector<std::string> 	splitString(const std::string& input, char delimiter);
 
 void serverReplyofChannel(std::string code, std::string chname ,std::string message, Client *client);
 void serverReplyofChannelsec(std::string code, std::string message, Client *client);
+void srvRplErr(std::string code, std::string chname, Client *client, Server &server);

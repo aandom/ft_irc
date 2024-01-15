@@ -2,7 +2,7 @@ TARGET = ircserv
 OBJ_PATH = obj
 CXX = c++
 sanitizer = -g3 -fsanitize=address -fno-omit-frame-pointer
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 #$(sanitizer)
 
 SRCS = main.cpp Server.cpp Client.cpp Command.cpp Commands_utils.cpp Channelcmds.cpp Channel.cpp servError.cpp chcmdsutils.cpp
 
