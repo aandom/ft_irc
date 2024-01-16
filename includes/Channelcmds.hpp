@@ -79,5 +79,6 @@ void names(Server &server, Client *client, std::vector<std::string> &input);
 void invite(Server &server, Client *client, std::vector<std::string> &input);
 void kick(Server &server, Client *client, std::vector<std::string> &input);
 void mode(Server &server, Client *client, std::vector<std::string> &input);
+// ** //void noticechannel(Server &server, Client *client, std::vector<std::string> &input);
 
 #endif

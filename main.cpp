@@ -26,14 +26,48 @@ int main (int argc, char *argv[])
 
 // to start server
 // ./ircserv <port> <password>
+// /set nick <name>
+// /set user_name <user name>
+//  /set real_name <real_name
+// /connect localhost <port> <password>
+// /oper 127.0.0.1 pa$$word
+// /join #<channel_name>
+// /msg <nick> <message>
 
 // for client run irssi in docker (change irssi to irssi1 etc for each client)
 // docker run -it --rm --name irssi --network host irssi
 // /set nick <name>
+// /set user_name <user name>
+//  /set real_name <real_name
 // /connect host.docker.internal <port> <password>
+
 // /join #<channel_name>
 // /msg <nick> <message>
-// ...
+
 
 // for client locally
 // nc localhost <password>
+// PASS <pass>
+// NICK <nick>
+// USER <nick> 0 <localhost> :<first_name last_name>
+// OPER 127.0.0.1 pa$$word
+// PRIVMSG ??
+
+
+// JOIN <channel>{,<channel>} [<key>{,<key>}]
+// above means list channels seperated by commas and the list their keys
+//KICK channel, channel user, user reason
+//PART <channel>{,<channel>} [<reason>]
+// TOPIC <channel> : [<topic>]
+// INVITE <nickname> <channel>
+// MODE <target>[<mode string> [<mode arguments>...]]
+// ∗ KICK - Eject a client from the channel
+// ∗ INVITE - Invite a client to a channel
+// ∗ TOPIC - Change or view the channel topic
+// ∗ MODE - Change the channel’s mode:
+// · i: Set/remove Invite-only channel
+// · t: Set/remove the restrictions of the TOPIC command to channel
+// operators
+// · k: Set/remove the channel key (password)
+// · o: Give/take channel operator privilege
+// · l: Set/remove the user limit to channel

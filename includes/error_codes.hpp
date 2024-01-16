@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <string>
 # define RESET "\033[0m"
+# define RED "\033[31m"
 
 #define ERR_NOSUCHNICK "\033[31m 401 "
 #define ERR_NOSUCHSERVER "\033[31m 402 "
@@ -31,8 +32,8 @@
 #define ERR_INVITEONLYCHAN "\033[31m 473 "
 #define ERR_BADCHANNELKEY "\033[31m 475 "
 #define ERR_BADCHANMASK "\033[31m 476 "
-#define ERR_NOPRIVILEGES "\033[31m 481 "
-#define ERR_CHANOPRIVSNEEDED "\033[31m 482 "
+#define ERR_NOPRIVILEGES "RED 481 "
+#define ERR_CHANOPRIVSNEEDED "RED 482 "
 #define ERR_UMODEUNKOWNFLAG "\033[31m 501 "
 #define ERR_USERSDONTMATCH "\033[31m 502 "
 #define ERR_KEYSET " 467 "

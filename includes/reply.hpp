@@ -1,5 +1,8 @@
 #pragma once
 
+// #define BLUE "\033[1;30m"
+// #define MAGENTA "\033[1;35m"
+
 #define RPL_WELCOME			" 001 "
 #define RPL_YOURHOST		" 002 "
 #define RPL_CREATED 		" 003 "

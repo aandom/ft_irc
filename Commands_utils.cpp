@@ -123,6 +123,7 @@ void registrationReply(Client *client) {
 	serverReply(RPL_CREATED, ":This server was created sometime", client);
 	serverReply(RPL_MYINFO, ": " + client->hostname, client);
 	serverReply(RPL_ISUPPORT, "CHANMODES=,k,l,it MODES=2 MAXNICKLEN=16 NICKLEN=16 CHANNELLEN=50 CHANTYPES=#& :are supported by this server", client);
+	// ??
 	serverReply(" 422 ", ":MOTD File is missing", client);
 }
 

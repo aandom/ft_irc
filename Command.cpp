@@ -22,6 +22,7 @@ Command::Command(Server *server, Client *client, std::string str, int i) {
 	clcmds["MODE"]   = &Command::modeCommand;
 	// **
 	clcmds ["kill"]   = &Command::killCommand;
+	// clcmds["NOTICE"] = &Command::noticeCommand;
 }
 
 Command::t_command Command::r_commands[] = {
@@ -124,7 +125,7 @@ void Command::killCommand() {
 			{
 				if ((*ch_iterator)->checkIfMember(tokens[1]))
 				{
-					sendMessage(tokens[1] + " killed by " + client->nickname + "because of " + reason , (*ch_iterator));
+					sendMessage(tokens[1] + " killed by " + client->nickname + " because of " + reason , (*ch_iterator));
 					(*ch_iterator)->removeClient(tobekilled);
 				}
 			}
