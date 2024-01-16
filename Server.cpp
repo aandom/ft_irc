@@ -162,25 +162,28 @@ void Server::accept_client () {
 
 void Server::read_client (int i) {
 	this->close_conn = FALSE;
+	// std::cout << "this is read_client" << std::endl;
 	std::string str;
-	while (TRUE) 
-	{
+	// while (TRUE) 
+	// {
 		std::memset(buffer, 0, sizeof(buffer));
 		this->rc = recv(this->fds[i].fd, this->buffer, sizeof(this->buffer) - 2, 0);
+		// std::cout << "this is real client loop" << std::endl;
 		if (this->rc < 0) {
 			if (errno != EWOULDBLOCK) {
 				perror("  recv() failed");
 				this->close_conn = TRUE;
 			}
-			break;
+			// break;
 		}
 		str += this->buffer;
+		std::cout << str << std::endl;
 		if (this->rc == 0) {
 			std::cout << "  Connection closed" << std::endl;
 			this->close_conn = TRUE;
-			break;
+			// break;
 		}
-	}
+	// }
 	std::cout << "Received " << str.length() << " bytes in the below string" << std::endl << str;
 	std::vector<std::string> commands = splitString(str, '\n');
 	for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); it++)
@@ -234,9 +237,11 @@ void Server::printClients () {
 }
 
 void Server::main_loop() {
+	// int i = 0;
 	while (this->end_server == FALSE) 
 	{
 		ft_poll();
+		// std::cout << "Shortly after poll()... " <<++i << std::endl;
 		for (int i = 0; i < this->nfds; i++)
 		{
 			if(this->fds[i].revents == 0)
