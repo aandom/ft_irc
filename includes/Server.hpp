@@ -32,6 +32,8 @@
 #define TRUE             1
 #define FALSE            0
 
+extern int g_endServer;
+
 
 class Client;
 

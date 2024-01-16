@@ -109,7 +109,7 @@ void Server::init_server() {
     bind_socket();
     start_listening();
     initialize_poll();
-    // freeaddrinfo(this->address);
+    freeaddrinfo(this->address);
     this->timeout = (5 * 60 * 1000);
 }
 
@@ -177,7 +177,7 @@ void Server::read_client (int i) {
 			// break;
 		}
 		str += this->buffer;
-		std::cout << str << std::endl;
+		// std::cout << str << std::endl;
 		if (this->rc == 0) {
 			std::cout << "  Connection closed" << std::endl;
 			this->close_conn = TRUE;
@@ -238,12 +238,12 @@ void Server::printClients () {
 
 void Server::main_loop() {
 	// int i = 0;
-	while (this->end_server == FALSE) 
+	while (this->end_server == FALSE && g_endServer == FALSE) 
 	{
 		ft_poll();
-		// std::cout << "Shortly after poll()... " <<++i << std::endl;
 		for (int i = 0; i < this->nfds; i++)
 		{
+			std::cout << "fd = "<< this->fds[i].fd << "revent value  :  " << this->fds[i].revents << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
