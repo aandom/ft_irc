@@ -24,6 +24,15 @@ Server::~Server() {
 			close_connection(this->fds[i].fd);
 		// 	close(this->fds[i].fd);
 	}
+	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
+	{
+		delete it->second;
+	}
+
+	for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+	{
+		delete *it;
+	}
 	std::cout << "closing socket\n";
 	close(this->socket_fd);
 	// clear fd, client, channel,
@@ -116,7 +125,7 @@ void Server::init_server() {
     bind_socket();
     start_listening();
     initialize_poll();
-    // freeaddrinfo(this->address);
+    freeaddrinfo(this->address);
     this->timeout = (5 * 60 * 1000);
 }
 
@@ -124,7 +133,7 @@ void Server::ft_poll() {
 	// std::cout << "Waiting on poll()..." << std::endl;
 	this->rc = poll(this->fds, this->nfds, -1);
 	if (this->rc < 0)	{
-		perror("  poll() failed");
+		perror(" at poll()");
 		this->end_server = TRUE;
 	}
 	if (this->rc == 0) {
@@ -170,8 +179,8 @@ void Server::accept_client () {
 void Server::read_client (int i) {
 	this->close_conn = FALSE;
 	std::string str;
-	// while (TRUE)
-	// {
+	while (TRUE)
+	{
 		std::memset(buffer, 0, sizeof(buffer));
 		this->rc = recv(this->fds[i].fd, this->buffer, sizeof(this->buffer) - 2, 0);
 		if (this->rc < 0) {
@@ -179,16 +188,16 @@ void Server::read_client (int i) {
 				perror("  recv() failed");
 				this->close_conn = TRUE;
 			}
-			// break;
+			break;
 		}
 		str += this->buffer;
 		if (this->rc == 0) {
 			std::cout << "  Connection closed" << std::endl;
 			this->close_conn = TRUE;
-			// break;
+			break;
 		}
-	// }
-	std::cout << "\033[32m " << str.length() << " bytes in the below string" << RESET << std::endl <<  "[" << str << "]";
+	}
+	std::cout << "Received " << str.length() << " bytes in the below string" << std::endl << str;
 	std::vector<std::string> commands = splitString(str, '\n');
 	for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); it++)
 	{
@@ -246,6 +255,7 @@ void Server::main_loop() {
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
 		{
+			// std::cout << "fd = "<< this->fds[i].fd << "  revent value  :  " << this->fds[i].revents  << " and i = " << i << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
@@ -257,7 +267,6 @@ void Server::main_loop() {
 		}
 		if (this->compress_array)
 			compress_fds();
-		// printClients();
 	}
 }
 

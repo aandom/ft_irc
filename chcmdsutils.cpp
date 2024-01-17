@@ -122,12 +122,14 @@ std::string getNewTopic(std::vector<std::string> & input) {
 	for (std::vector<std::string>::iterator it = input.begin() + 2; it != input.end(); it++) {
 		(it + 1) != input.end() ? new_topic.append(*it + " ") : new_topic.append(*it);
     }
-    if (new_topic.size() == 0)
+    if (new_topic.size() == 0) {
         return new_topic;
+	}
 	// (new_topic.at(0) != ':') ? new_topic.insert(0, ":") : new_topic.insert(0, "");
 	// clear new_topic if only ":"
-	if (new_topic.size() == 1)
+	if (new_topic.size() == 1) {
 		new_topic = "";
+	}
     std::cout << "new_topic_1 [" << new_topic << "]" << std::endl;
     return (new_topic);
 }
@@ -135,15 +137,18 @@ std::string getNewTopic(std::vector<std::string> & input) {
 std::string getReason(std::vector<std::string> & input, size_t minpar) {
     std::string reason = "";
 
-    if (input.size() < minpar + 1)
+    if (input.size() < minpar + 1) {
         return (reason);
+	}
 	for (std::vector<std::string>::iterator it = input.begin() + minpar; it != input.end(); it++)
 		(it + 1) != input.end() ? reason.append(*it + " ") : reason.append(*it);
-	if (reason.at(0) != ':')
+	if (reason.at(0) != ':') {
 		reason.insert(0, ":");
+	}
 	// clear reason if only ":"
-	if (reason.size() == 1)
+	if (reason.size() == 1) {
 		reason = "";
+	}
     return (reason);
 }
 

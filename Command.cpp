@@ -300,15 +300,17 @@ void Command::motdCommand() {
 }
 
 void Command::quitCommand() {
-	sendResponse("QUIT :Bye bye", this->client);
-	server->clients.erase(client->fd);
-	close(client->fd);
+	// sendResponse("QUIT :Bye bye", this->client);
+	int temp_fd = client->fd;
+	delete client;
+	server->clients.erase(temp_fd);
+	close(temp_fd);
 	this->server->fds[this->i].fd = -1;
 	server->compress_array = true;
 }
 
 void Command::whoisCommand() {
-	if (tokens.size() >= 2) {
+	if (this->tokens.size() >= 2) {
 		std::string nickname = tokens[1];
 		for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 		{
