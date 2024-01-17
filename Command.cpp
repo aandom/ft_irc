@@ -243,6 +243,7 @@ void Command::motdCommand() {
 
 void Command::quitCommand() {
 	// sendResponse("QUIT :Bye bye", this->client);
+	std::cout << " client getting disconnected: " << client->nickname << std::endl;
 	int temp_fd = client->fd;
 	delete client;
 	server->clients.erase(temp_fd);
@@ -284,6 +285,7 @@ void Command::handleException(std::string err) {
 }
 
 void Command::executeCommand() {
+	std::cout << "command: " << this->command << std::endl;
 	if (client->is_registered == false) {
 		for (int i = 0; !r_commands[i].name.empty(); i++)
 		{

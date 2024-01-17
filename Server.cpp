@@ -170,6 +170,7 @@ void Server::accept_client () {
 }
 
 void Server::read_client (int i) {
+	bool is_quit = false;
 	this->close_conn = FALSE;
 	std::memset(this->clients[this->fds[i].fd]->buffer, 0, sizeof(this->clients[this->fds[i].fd]->buffer));
 	this->rc = recv(this->fds[i].fd, this->clients[this->fds[i].fd]->buffer, sizeof(this->clients[this->fds[i].fd]->buffer) - 2, 0);
@@ -194,11 +195,12 @@ void Server::read_client (int i) {
 			Command cmd(this, this->clients[this->fds[i].fd], *it, i);
 			cmd.parse_command();
 			cmd.executeCommand();
+			if (cmd.command == "QUIT")
+				is_quit = true;
 		}
-		// std::memset(&this->clients[this->fds[i].fd]->str, 0, sizeof(this->clients[this->fds[i].fd]->str));
-		this->clients[this->fds[i].fd]->str = "";
+		if (!is_quit)
+			this->clients[this->fds[i].fd]->str.clear();
 	}
-	// std::memset(&this->clients[this->fds[i].fd]->buffer, 0, sizeof(this->clients[this->fds[i].fd]->buffer));
 	if (this->close_conn) {
 		close(this->fds[i].fd);
 		this->fds[i].fd = -1;
