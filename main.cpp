@@ -23,4 +23,4 @@ int main (int argc, char *argv[])
 }
 
 
-// docker run -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --security-opt apparmor=unconfined --name 42-valgrind --network host --rm -v "$PWD:/home/vscode/src" valgrind "/bin/zsh"
+// docker run -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --security-opt apparmor=unconfined --name 42-valgrind1 --network host --rm -v "$PWD:/home/vscode/src" valgrind "/bin/zsh"
