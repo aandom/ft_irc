@@ -32,7 +32,6 @@
 #define TRUE             1
 #define FALSE            0
 
-// int g_endServer;
 extern int g_endServer;
 
 
@@ -44,7 +43,6 @@ class Server {
 		int					port;
 		int					new_sd;
 		int					rc;
-		char   				buffer[1024];
 		struct addrinfo		*address;
 		int				    timeout;
 		std::string			password;

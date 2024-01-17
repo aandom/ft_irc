@@ -2,7 +2,7 @@ TARGET = ircserv
 OBJ_PATH = obj
 CXX = c++
 sanitizer = -fsanitize=address -fno-omit-frame-pointer
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98  -g3 #$(sanitizer)
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98  -g3 $(sanitizer)
 
 SRCS = main.cpp Server.cpp Client.cpp Command.cpp Commands_utils.cpp Channelcmds.cpp Channel.cpp servError.cpp chcmdsutils.cpp
 
@@ -30,7 +30,7 @@ re: clean all
 
 push: fclean
 	git add .
-	git commit -m "Updated on $(shell date +'%Y-%m-%d %H:%M:%S') by $(shell whoami)"
+	git commit -m "Fixed Ctr+D on $(shell date +'%Y-%m-%d %H:%M:%S') by $(shell whoami)"
 	git push -u origin master
 
 .PHONY: all clean fclean re push

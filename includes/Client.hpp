@@ -19,6 +19,8 @@ public:
 	std::string hostname;
 	std::string servername;
 	std::string client_ip;
+	char   		buffer[1024];
+	std::string str;
 	bool 		is_registered;
 	bool		is_authenticated;
 	bool		is_operator;
