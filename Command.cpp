@@ -56,21 +56,22 @@ void Command::NickCommand() {
 		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", client));
 	if (tokens.size() >= 2) {
 		std::string nickname = tokens[1];
-		std::cout << "nickname: " << nickname << std::endl;
+		// std::cout << "nickname: [" << nickname "]"<< std::endl;
 		if (!isUniqueNickname(nickname, this->server->clients, this->client)) {
+			std::cout << "nickname: [" << nickname << "]" << std::endl;
 			serverReply(ERR_NICKNAMEINUSE, "Nickname is already in use", client);
 		} else {
 			client->nickname = nickname;
-			if (!client->username.empty()) 
+			if (!client->username.empty())
 			{
 				registrationReply(client);
 				client->is_registered = true;
 			}
-			
+
 		}
 	} else
 		serverReply(ERR_NONICKNAMEGIVEN, "No nickname given", client);
-	
+
 }
 
 void Command::CapCommand() {
@@ -110,7 +111,7 @@ void Command::killCommand() {
 			reason += tokens[i];
 		}
 		std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
-		if (this->client->is_operator && this->client->is_registered)
+		if (this->client->is_operator )
 		{
 			std::string reason = tokens[2];
 			for (int i = 3; i < static_cast<int>(tokens.size()); i++)
@@ -168,7 +169,7 @@ void Command::UserCommand() {
 	this->client->username = tokens[1];
 	this->client->servername = tokens[3];
 	this->client->realname = tokens[4];
-	if (!this->client->nickname.empty()) 
+	if (!this->client->nickname.empty())
 	{
 		this->client->is_registered = true;
 		registrationReply(client);

@@ -1,4 +1,5 @@
 #include "includes/Server.hpp"
+#include "csignal"
 
 bool end_server = FALSE;
 
@@ -15,7 +16,7 @@ int main (int argc, char *argv[])
         return 1;
     }
     signal(SIGINT, signalHandler);
-    signal(SIGTERM, signalHandler);
+    // signal(SIGTERM, signalHandler);
 	Server server(argv);
 	server.init_server();
 	server.main_loop();
@@ -51,7 +52,7 @@ int main (int argc, char *argv[])
 // NICK <nick>
 // USER <nick> 0 <localhost> :<first_name last_name>
 // OPER 127.0.0.1 pa$$word
-// PRIVMSG ??
+// PRIVMSG <nick to be sent to> : message
 
 
 // JOIN <channel>{,<channel>} [<key>{,<key>}]

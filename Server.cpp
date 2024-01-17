@@ -170,8 +170,8 @@ void Server::accept_client () {
 void Server::read_client (int i) {
 	this->close_conn = FALSE;
 	std::string str;
-	while (TRUE)
-	{
+	// while (TRUE)
+	// {
 		std::memset(buffer, 0, sizeof(buffer));
 		this->rc = recv(this->fds[i].fd, this->buffer, sizeof(this->buffer) - 2, 0);
 		if (this->rc < 0) {
@@ -179,16 +179,16 @@ void Server::read_client (int i) {
 				perror("  recv() failed");
 				this->close_conn = TRUE;
 			}
-			break;
+			// break;
 		}
 		str += this->buffer;
 		if (this->rc == 0) {
 			std::cout << "  Connection closed" << std::endl;
 			this->close_conn = TRUE;
-			break;
+			// break;
 		}
-	}
-	std::cout << "\033[32m Received " << str.length() << " bytes in the below string" << RESET << std::endl << str;
+	// }
+	std::cout << "\033[32m " << str.length() << " bytes in the below string" << RESET << std::endl <<  "[" << str << "]";
 	std::vector<std::string> commands = splitString(str, '\n');
 	for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); it++)
 	{
