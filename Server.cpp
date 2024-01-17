@@ -190,8 +190,10 @@ void Server::read_client (int i) {
 			cmd.parse_command();
 			cmd.executeCommand();
 		}
-		std::memset(&this->clients[this->fds[i].fd]->str, 0, sizeof(this->clients[this->fds[i].fd]->str));
+		// std::memset(&this->clients[this->fds[i].fd]->str, 0, sizeof(this->clients[this->fds[i].fd]->str));
+		this->clients[this->fds[i].fd]->str = "";
 	}
+	// std::memset(&this->clients[this->fds[i].fd]->buffer, 0, sizeof(this->clients[this->fds[i].fd]->buffer));
 	if (this->close_conn) {
 		close(this->fds[i].fd);
 		this->fds[i].fd = -1;
