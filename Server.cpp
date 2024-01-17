@@ -17,7 +17,6 @@ Server::Server(char *argv[]) {
 
 Server::~Server() {
 	std::cout << "Destructor Called\n";
-    freeaddrinfo(this->address);
 	for (int i = 0; i < this->nfds; i++)
 	{
 		if(this->fds[i].fd >= 0)
@@ -177,6 +176,7 @@ void Server::accept_client () {
 }
 
 void Server::read_client (int i) {
+	bool is_quit = false;
 	this->close_conn = FALSE;
 	std::memset(this->clients[this->fds[i].fd]->buffer, 0, sizeof(this->clients[this->fds[i].fd]->buffer));
 	this->rc = recv(this->fds[i].fd, this->clients[this->fds[i].fd]->buffer, sizeof(this->clients[this->fds[i].fd]->buffer) - 2, 0);
@@ -201,52 +201,18 @@ void Server::read_client (int i) {
 			Command cmd(this, this->clients[this->fds[i].fd], *it, i);
 			cmd.parse_command();
 			cmd.executeCommand();
+			if (cmd.command == "QUIT")
+				is_quit = true;
 		}
-		// std::memset(&this->clients[this->fds[i].fd]->str, 0, sizeof(this->clients[this->fds[i].fd]->str));
-		this->clients[this->fds[i].fd]->str = "";
+		if (!is_quit)
+			this->clients[this->fds[i].fd]->str.clear();
 	}
-	// std::memset(&this->clients[this->fds[i].fd]->buffer, 0, sizeof(this->clients[this->fds[i].fd]->buffer));
 	if (this->close_conn) {
 		close(this->fds[i].fd);
 		this->fds[i].fd = -1;
 		this->compress_array = TRUE;
 	}
 }
-// 	this->close_conn = FALSE;
-// 	std::string str;
-// 	while (TRUE)
-// 	{
-// 		std::memset(buffer, 0, sizeof(buffer));
-// 		this->rc = recv(this->fds[i].fd, this->buffer, sizeof(this->buffer) - 2, 0);
-// 		if (this->rc < 0) {
-// 			if (errno != EWOULDBLOCK) {
-// 				perror("  recv() failed");
-// 				this->close_conn = TRUE;
-// 			}
-// 			break;
-// 		}
-// 		str += this->buffer;
-// 		if (this->rc == 0) {
-// 			std::cout << "  Connection closed" << std::endl;
-// 			this->close_conn = TRUE;
-// 			break;
-// 		}
-// 	}
-// 	std::cout << "Received " << str.length() << " bytes in the below string" << std::endl << str;
-// 	std::vector<std::string> commands = splitString(str, '\n');
-// 	for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); it++)
-// 	{
-// 		Command cmd(this, this->clients[this->fds[i].fd], *it, i);
-// 		cmd.parse_command();
-// 		cmd.executeCommand();
-// 	}
-// 	memset(this->buffer, 0, sizeof(this->buffer));
-// 	if (this->close_conn) {
-// 		close(this->fds[i].fd);
-// 		this->fds[i].fd = -1;
-// 		this->compress_array = TRUE;
-// 	}
-// }
 
 void Server::compress_fds () {
 	this->compress_array = FALSE;

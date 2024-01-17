@@ -104,6 +104,7 @@ void Command::killCommand() {
 			serverReplyofChannelsec(" 401 ", " " + client->nickname + " " + tokens[1] + getErrmsg(401, *server), client);
 			throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
     	}
+		std::cout << "\033[31m" << tobekilled->fd << std::endl;
 		std::string reason = tokens[2];
 		for (int i = 3; i < static_cast<int>(tokens.size()); i++)
 		{
@@ -133,10 +134,22 @@ void Command::killCommand() {
 			// send msg to killee
 			std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
 			sendResponse(message , tobekilled);
-			tobekilled->is_registered = false;
-			server->clients.erase(tobekilled->fd);
-			close(tobekilled->fd);
-			this->server->fds[this->i].fd = -1;
+			int temp_fd = tobekilled->fd;
+			std::cout << "\033[31m" << temp_fd << RESET << std::endl;
+			std::cout << this->server->nfds << std::endl;
+			int index;
+			for (int i = 0; i < this->server->nfds; i++) {
+				if (this->server->fds[i].fd == temp_fd)	{
+					// std::cout << temp_fd << this->server->fds[i].fd << " and  i = " << i << std::endl;
+					index = i;
+					break;
+				}
+			}
+			close(temp_fd);
+			delete tobekilled;
+			server->clients.erase(temp_fd);
+			std::cout << "closing fd = " << this->server->fds[index].fd << " and  index = " << index << std::endl;
+			this->server->fds[index].fd = -1;
 			server->compress_array = true;
 		}
 		else
