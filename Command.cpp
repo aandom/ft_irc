@@ -252,7 +252,7 @@ void Command::quitCommand() {
 }
 
 void Command::whoisCommand() {
-	if (tokens.size() >= 2) {
+	if (this->tokens.size() >= 2) {
 		std::string nickname = tokens[1];
 		for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 		{

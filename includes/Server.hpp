@@ -32,6 +32,7 @@
 #define TRUE             1
 #define FALSE            0
 
+// int g_endServer;
 extern int g_endServer;
 
 

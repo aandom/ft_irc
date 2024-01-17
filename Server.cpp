@@ -21,6 +21,10 @@ Server::~Server() {
 		if(this->fds[i].fd >= 0)
 			close(this->fds[i].fd);
 	}
+	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
+	{
+		delete it->second;
+	}
 }
 
 Server::Server(Server const &src) {
@@ -117,7 +121,7 @@ void Server::ft_poll() {
 	// std::cout << "Waiting on poll()..." << std::endl;
 	this->rc = poll(this->fds, this->nfds, -1);
 	if (this->rc < 0)	{
-		perror("  poll() failed");
+		perror(" at poll()");
 		this->end_server = TRUE;
 	}
 	if (this->rc == 0) {
@@ -243,7 +247,7 @@ void Server::main_loop() {
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
 		{
-			std::cout << "fd = "<< this->fds[i].fd << "revent value  :  " << this->fds[i].revents << std::endl;
+			// std::cout << "fd = "<< this->fds[i].fd << "revent value  :  " << this->fds[i].revents << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
@@ -255,7 +259,6 @@ void Server::main_loop() {
 		}
 		if (this->compress_array)
 			compress_fds();
-		// printClients();
 	}
 }
 

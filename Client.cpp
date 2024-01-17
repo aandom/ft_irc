@@ -6,6 +6,7 @@ Client::Client(int fd, char *client_ip) {
 	this->hostname = client_ip;
 	this->is_registered = false;
 	this->is_authenticated = false;
+	this->is_operator = false;
 }
 
 Client::Client(Client const &src) {

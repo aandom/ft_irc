@@ -21,3 +21,6 @@ int main (int argc, char *argv[])
 	server.main_loop();
 	return 0;
 }
+
+
+// docker run -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --security-opt apparmor=unconfined --name 42-valgrind --network host --rm -v "$PWD:/home/vscode/src" valgrind "/bin/zsh"
