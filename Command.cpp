@@ -20,6 +20,9 @@ Command::Command(Server *server, Client *client, std::string str, int i) {
 	clcmds["PRIVMSG"] = &Command::PrivmsgCommand;
 	clcmds["WHOIS"]   = &Command::whoisCommand;
 	clcmds["MODE"]   = &Command::modeCommand;
+	// **
+	clcmds ["kill"]   = &Command::killCommand;
+	// clcmds["NOTICE"] = &Command::noticeCommand;
 }
 
 Command::t_command Command::r_commands[] = {
@@ -53,21 +56,22 @@ void Command::NickCommand() {
 		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", client));
 	if (tokens.size() >= 2) {
 		std::string nickname = tokens[1];
-		std::cout << "nickname: " << nickname << std::endl;
+		// std::cout << "nickname: [" << nickname "]"<< std::endl;
 		if (!isUniqueNickname(nickname, this->server->clients, this->client)) {
+			std::cout << "nickname: [" << nickname << "]" << std::endl;
 			serverReply(ERR_NICKNAMEINUSE, "Nickname is already in use", client);
 		} else {
 			client->nickname = nickname;
-			if (!client->username.empty()) 
+			if (!client->username.empty())
 			{
 				registrationReply(client);
 				client->is_registered = true;
 			}
-			
+
 		}
 	} else
 		serverReply(ERR_NONICKNAMEGIVEN, "No nickname given", client);
-	
+
 }
 
 void Command::CapCommand() {
@@ -86,6 +90,73 @@ void Command::CapCommand() {
 			serverReply(ERR_UNKNOWNCOMMAND, "CAP : Unknown command", client);
 	} else
 			serverReply(ERR_NEEDMOREPARAMS, "CAP : Need more parameters", client);
+}
+
+// // KILL <killee> <reasonto be killed>
+// // "Closing Link: <servername> (Killed (<killer> (<reason>))) for killee
+// // "Killed (<killer> (<reason>))" for all chanels is member of
+void Command::killCommand() {
+	Client *tobekilled = NULL;
+	if (tokens.size() >= 3)
+	{
+		tobekilled = this->server->getClientIfExist(tokens[1]);
+		if (!tobekilled){
+			serverReplyofChannelsec(" 401 ", " " + client->nickname + " " + tokens[1] + getErrmsg(401, *server), client);
+			throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
+    	}
+		std::cout << "\033[31m" << tobekilled->fd << std::endl;
+		std::string reason = tokens[2];
+		for (int i = 3; i < static_cast<int>(tokens.size()); i++)
+		{
+			reason += " ";
+			reason += tokens[i];
+		}
+		std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
+		if (this->client->is_operator )
+		{
+			std::string reason = tokens[2];
+			for (int i = 3; i < static_cast<int>(tokens.size()); i++)
+			{
+				reason += " ";
+				reason += tokens[i];
+			}
+			// send message to others that share channel
+			std::vector<Channel *> channels = server->getChannels();
+			std::vector<Channel *>::iterator ch_iterator = channels.begin();
+			for(; ch_iterator != channels.end(); ++ch_iterator)
+			{
+				if ((*ch_iterator)->checkIfMember(tokens[1]))
+				{
+					sendMessage(tokens[1] + " killed by " + client->nickname + " because of " + reason , (*ch_iterator));
+					(*ch_iterator)->removeClient(tobekilled);
+				}
+			}
+			// send msg to killee
+			std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
+			sendResponse(message , tobekilled);
+			int temp_fd = tobekilled->fd;
+			std::cout << "\033[31m" << temp_fd << RESET << std::endl;
+			std::cout << this->server->nfds << std::endl;
+			int index;
+			for (int i = 0; i < this->server->nfds; i++) {
+				if (this->server->fds[i].fd == temp_fd)	{
+					// std::cout << temp_fd << this->server->fds[i].fd << " and  i = " << i << std::endl;
+					index = i;
+					break;
+				}
+			}
+			close(temp_fd);
+			delete tobekilled;
+			server->clients.erase(temp_fd);
+			std::cout << "closing fd = " << this->server->fds[index].fd << " and  index = " << index << std::endl;
+			this->server->fds[index].fd = -1;
+			server->compress_array = true;
+		}
+		else
+			serverReply(ERR_NOPRIVILEGES ,ERR_NOPRIVILEGES_MSG,  client);
+	}
+	else
+		serverReply(ERR_NEEDMOREPARAMS, "\033[31m KILL : Need more parameters \033[30m", client);
 }
 
 void Command::PassCommand() {
@@ -111,7 +182,7 @@ void Command::UserCommand() {
 	this->client->username = tokens[1];
 	this->client->servername = tokens[3];
 	this->client->realname = tokens[4];
-	if (!this->client->nickname.empty()) 
+	if (!this->client->nickname.empty())
 	{
 		this->client->is_registered = true;
 		registrationReply(client);
@@ -166,7 +237,7 @@ void Command::PrivmsgCommand() {
 				}
 			}
 		}
-		else 
+		else
 		{
 			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 			{
@@ -212,7 +283,7 @@ void Command::userMode() {
 			}
 			return;
 		}
-	}	
+	}
 	serverReply(ERR_NOSUCHNICK, "MODE :No such nick/channel", client);
 }
 
@@ -224,7 +295,7 @@ void Command::modeCommand() {
 		} catch(const std::exception& e) {
 			handleException(e.what());
 		}
-			
+
 	}
 	else if (tokens.size() >= 3)
 		userMode();
@@ -248,7 +319,7 @@ void Command::quitCommand() {
 	delete client;
 	server->clients.erase(temp_fd);
 	close(temp_fd);
-	this->server->fds[this->i].fd = -1;			
+	this->server->fds[this->i].fd = -1;
 	server->compress_array = true;
 }
 
@@ -299,7 +370,7 @@ void Command::executeCommand() {
 		}
 		return (serverReply(ERR_UNKNOWNCOMMAND, "unknown command before registration", client));
 	}
-	else 
+	else
 	{
 		try {
 			if (clcmds.find(this->command) != clcmds.end()){

@@ -39,7 +39,7 @@ push: fclean
 .PHONY: all clean fclean re push
 
 leaks: $(TARGET)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TARGET) 6667 pass
+	valgrind ./$(TARGET) 6667 pass
 
 docker:
 	docker run -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --security-opt apparmor=unconfined --name 42-valgrind$(shell date '+%H%M%S') --network host --rm -v $(pwd) valgrind "/bin/zsh"

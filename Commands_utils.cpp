@@ -9,7 +9,7 @@ void sendResponse(std::string message, Client *client) {
 }
 
 void sendResponse1(std::string message, Client *client) {
-	std::string response = message + "\r\n";
+	std::string response = message + RESET + "\r\n";
 	int ret = send(client->fd, response.c_str(), response.length(), 0);
 	if (ret == -1)
 		std::cout << "ERROR: " << strerror(errno) << std::endl;
@@ -72,8 +72,8 @@ std::vector<std::string> tokenizeMessage(std::string str) {
 // 	str = trimChars(str, "\r\n");
 //     std::istringstream iss(str);
 //     std::string token;
-    
-//     if (std::strchr(str.c_str(), ':')) 
+
+//     if (std::strchr(str.c_str(), ':'))
 // 	{
 // 		std::vector<std::string> tokensBeforeColon;
 // 		while (getline(iss, token, ':')) {
@@ -90,7 +90,7 @@ std::vector<std::string> tokenizeMessage(std::string str) {
 // 		} else
 // 			tokens.push_back(str);
 // 	}
-// 	else 
+// 	else
 // 	{
 // 		while (iss >> token)
 // 			tokens.push_back(token);
@@ -123,6 +123,7 @@ void registrationReply(Client *client) {
 	serverReply(RPL_CREATED, ":This server was created sometime", client);
 	serverReply(RPL_MYINFO, ": " + client->hostname, client);
 	serverReply(RPL_ISUPPORT, "CHANMODES=,k,l,it MODES=2 MAXNICKLEN=16 NICKLEN=16 CHANNELLEN=50 CHANTYPES=#& :are supported by this server", client);
+	// ??
 	serverReply(" 422 ", ":MOTD File is missing", client);
 }
 

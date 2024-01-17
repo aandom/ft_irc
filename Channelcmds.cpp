@@ -65,6 +65,11 @@ void names(Server &server, Client *client, std::vector<std::string> &input) {
     }
 }
 
+// ** //void noticechannel(Server &server, Client *client, std::vector<std::string> &input) {
+//     (void)server;
+//     (void)client;
+//     (void)input;
+// }
 
 void privMsgchannel(Server &server, Client *client, std::vector<std::string> &input) {
     Channel *channel = NULL;

@@ -16,10 +16,12 @@ Server::Server(char *argv[]) {
 }
 
 Server::~Server() {
+	std::cout << "Destructor Called\n";
 	for (int i = 0; i < this->nfds; i++)
 	{
 		if(this->fds[i].fd >= 0)
-			close(this->fds[i].fd);
+			close_connection(this->fds[i].fd);
+		// 	close(this->fds[i].fd);
 	}
 	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
 	{
@@ -30,6 +32,10 @@ Server::~Server() {
 	{
 		delete *it;
 	}
+	std::cout << "closing socket\n";
+	close(this->socket_fd);
+	// clear fd, client, channel,
+	// what about command objects?
 }
 
 Server::Server(Server const &src) {
@@ -86,7 +92,7 @@ void Server::set_socket_options() {
     int on = 1;
     if (setsockopt(this->socket_fd, SOL_SOCKET,  SO_REUSEADDR, &on, sizeof(on)) < 0)
         init_error("setsockopt() failed");
-    
+
     if (fcntl(this->socket_fd, F_SETFL, O_NONBLOCK) < 0)
         init_error("fcntl() failed");
 }
@@ -151,7 +157,7 @@ void Server::accept_client () {
 		struct sockaddr_in	new_client_addr;
 		socklen_t			new_client_addr_size;
 
-		new_client_addr_size = sizeof(new_client_addr);	
+		new_client_addr_size = sizeof(new_client_addr);
 		this->new_sd = accept(this->socket_fd, (struct sockaddr *)&new_client_addr, &new_client_addr_size);
 		if (this->new_sd < 0) {
 			if (errno != EWOULDBLOCK) {
@@ -160,8 +166,8 @@ void Server::accept_client () {
 			}
 			return;
 		}
-		std::cout << "Client IP: " << inet_ntoa(new_client_addr.sin_addr) << std::endl;
-		std::cout << "Client fd: " << this->new_sd << std::endl;
+		std::cout << "\033[32m Client IP: " << inet_ntoa(new_client_addr.sin_addr) << RESET << std::endl;
+		std::cout << "\033[32m Client fd: " << this->new_sd << RESET << std::endl;
 		this->clients[this->new_sd] = new Client(this->new_sd, inet_ntoa(new_client_addr.sin_addr));
 		this->fds[this->nfds].fd = this->new_sd;
 		this->fds[this->nfds].events = POLLIN;
@@ -245,8 +251,7 @@ void Server::printClients () {
 }
 
 void Server::main_loop() {
-	// int i = 0;
-	while (this->end_server == FALSE && g_endServer == FALSE) 
+	while (this->end_server == FALSE)
 	{
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
@@ -285,7 +290,7 @@ void	Server::removeChannel(Channel * channel) {
 std::vector<std::string> Server::getChannelNames() {
     std::vector<std::string> chNames;
     std::string              name;
-	std::vector<Channel *> _members = getChannels(); 
+	std::vector<Channel *> _members = getChannels();
     ch_iterator it = _members.begin();
     ch_iterator it_end = _members.end();
     for (; it != it_end; ++it) {
