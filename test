@@ -1,0 +1,93 @@
+<< CAP LS
+<< PASS 12345
+<< NICK gabdoush
+<< USER root root 10.11.2.7 :root
+>> CAP * LS :multi-prefix userhost-in-names
+<< CAP REQ :multi-prefix
+>> :10.11.2.7 001 gabdoush!~root@10.11.2.7 ::Welcome to the Internet Relay Network [0m
+<< MODE gabdoush!~root@10.11.2.7 +i
+<< WHOIS gabdoush
+>> :10.11.2.7 002 gabdoush!~root@10.11.2.7 ::Your host is 10.11.2.7, running version 1.0[0m
+>> :10.11.2.7 003 gabdoush!~root@10.11.2.7 ::This server was created sometime[0m
+>> :10.11.2.7 004 gabdoush!~root@10.11.2.7 :: 10.11.2.7[0m
+>> :10.11.2.7 005 gabdoush!~root@10.11.2.7 :CHANMODES=,k,l,it MODES=2 MAXNICKLEN=16 NICKLEN=16 CHANNELLEN=50 CHANTYPES=#& :are supported by this server[0m
+>> :10.11.2.7 422 gabdoush!~root@10.11.2.7 ::MOTD File is missing[0m
+>> :10.11.2.7[31m 421 gabdoush!~root@10.11.2.7 :unknown command after registration[0m
+>> :10.11.2.7 311 gabdoush!~root@10.11.2.7 :gabdoush root 10.11.2.7 * :root[0m
+>> :10.11.2.7 312 gabdoush!~root@10.11.2.7 :gabdoush 10.11.2.7 :Ft_IRC[0m
+>> :10.11.2.7 318 gabdoush!~root@10.11.2.7 :gabdoush :End of WHOIS list[0m
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< NICK gab
+>> :10.11.2.7 001 gab!~root@10.11.2.7 ::Welcome to the Internet Relay Network [0m
+<< MODE gab!~root@10.11.2.7 +i
+<< WHOIS gabdoush
+>> :10.11.2.7 002 gab!~root@10.11.2.7 ::Your host is 10.11.2.7, running version 1.0[0m
+>> :10.11.2.7 003 gab!~root@10.11.2.7 ::This server was created sometime[0m
+>> :10.11.2.7 004 gab!~root@10.11.2.7 :: 10.11.2.7[0m
+>> :10.11.2.7 005 gab!~root@10.11.2.7 :CHANMODES=,k,l,it MODES=2 MAXNICKLEN=16 NICKLEN=16 CHANNELLEN=50 CHANTYPES=#& :are supported by this server[0m
+>> :10.11.2.7 422 gab!~root@10.11.2.7 ::MOTD File is missing[0m
+>> :10.11.2.7[31m 401 gab!~root@10.11.2.7 :WHOIS :No such nick/channel[0m
+<< PING 10.11.2.7
+>> PONG #irssi
+--> FAILED whois
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> FAILED whois
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong
+<< PING 10.11.2.7
+>> PONG #irssi
+--> lag pong

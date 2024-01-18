@@ -19,7 +19,7 @@ Server::~Server() {
 	std::cout << "Destructor Called\n";
 	for (int i = 0; i < this->nfds; i++)
 	{
-		if(this->fds[i].fd >= 0)
+		if(this->fds[i].fd > 0)
 			close_connection(this->fds[i].fd);
 		// 	close(this->fds[i].fd);
 	}
@@ -260,7 +260,8 @@ void Server::main_loop() {
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
-				close_connection(i);
+				std::cout << "error fd here\n";
+				// close_connection(i);
 			else if (this->fds[i].fd == this->socket_fd)
 				accept_client();
 			else

@@ -21,25 +21,25 @@ void   printVector(std::vector<std::string> & input) {
 }
 
 std::string intToStr(int nbr) {
-    std::stringstream tmp;  
-    tmp << nbr;      
-    std::string str;          
+    std::stringstream tmp;
+    tmp << nbr;
+    std::string str;
     tmp >> str;
-    return ( "" + str + ""); 
+    return ( "" + str + "");
 }
 
 static std::string leftTrim(const std::string &s, const std::string tobetrimed) {
     size_t start = s.find_first_not_of(tobetrimed);
     return (start == std::string::npos) ? "" : s.substr(start);
 }
- 
+
 static std::string rightTrim(const std::string &s, const std::string tobetrimed) {
     size_t end = s.find_last_not_of(tobetrimed);
     return (end == std::string::npos) ? "" : s.substr(0, end + 1);
 }
 
 std::string trimChars(std::string str, const std::string tobetrimed) {
-	return (rightTrim(leftTrim(str, tobetrimed), tobetrimed));	
+	return (rightTrim(leftTrim(str, tobetrimed), tobetrimed));
 }
 
 
@@ -100,7 +100,7 @@ int checkModes(Channel * channel, Client * client, std::vector<std::string> & in
             return (473);
         if (channel->getmodeAt('l') && (channel->getNickNames(0).size() >= channel->getChLimit()))
             return (471);
-        
+
     }
     else if (checkfor == 't') {
         if (channel->getmodeAt('t') && !channel->isOperator(client))
@@ -113,7 +113,7 @@ std::string getJoinMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-              + " JOIN " + input[1]; 
+              + " JOIN " + input[1];
     return (res);
 }
 
@@ -157,7 +157,7 @@ std::string getPartMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-              + " PART " + input[1]; 
+              + " PART " + input[1];
     return (res);
 }
 
@@ -165,14 +165,14 @@ std::string getTopicMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-              + " TOPIC " + input[1] ; 
+              + " TOPIC " + input[1] ;
     return (res);
 }
 
 std::string getInviteMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
-    res = ":" + client->nickname + " " + "INVITE" + " " + input[1] + " " + input[2] + " :" + client->nickname + " is inviting you to join " + input[2]; 
+    res = ":" + client->nickname + " " + "INVITE" + " " + input[1] + " " + input[2] + " :" + client->nickname + " is inviting you to join " + input[2];
     return (res);
 }
 
@@ -180,7 +180,7 @@ std::string getKickMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-              + " KICK " + input[1] + " " + input[2]; 
+              + " KICK " + input[1] + " " + input[2];
     return (res);
 }
 
@@ -188,7 +188,7 @@ std::string getModeMessage(Client * client, std::vector<std::string> & input) {
     std::string res;
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-              + " MODE " + input[1] + " " + input[2]; 
+              + " MODE " + input[1] + " " + input[2];
     return (res);
 }
 
@@ -196,7 +196,7 @@ std::string getModeMessageTwo(Client * client, std::string chname , std::string 
     std::string res;
 
     res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
-              + " MODE "  + chname  + " :" + input; 
+              + " MODE "  + chname  + " :" + input;
     return (res);
 }
 
@@ -221,7 +221,7 @@ std::string getMofchannel(Channel * channel) {
 
 void    sendMessage(std::string const &msg, Channel * channel) {
     std::vector<Client *> members = channel->getMembers();
-    
+
     std::vector<Client *>::iterator it = members.begin();
 
     for (; it != members.end(); ++it) {
@@ -242,14 +242,36 @@ void UserToUserMessageChannel(std::string message, Client *src, Client *dst, Cha
 	}
 }
 
+void UserToUserMessageChannel2(std::string message, Client *src, Client *dst, Channel *channel) {
+	std::string msg = ":" + src->nickname + "!" + src->username + "@" + src->hostname + " NOTICE ";
+	msg += channel->getChName() + " :" + message + "\r\n";
+	int rc = send(dst->fd, msg.c_str(), msg.length(), 0);
+	if (rc == -1) {
+		std::cout << "ERROR: " << strerror(errno) << std::endl;
+		return;
+	}
+}
+
 void    sendMessageTwo(std::string const &msg, Channel * channel, Client *sender) {
     std::vector<Client *> members = channel->getMembers();
-    
+
     std::vector<Client *>::iterator it = members.begin();
 
     for (; it != members.end(); ++it) {
         Client * newcl = *it;
         if (newcl != sender)
             UserToUserMessageChannel(msg, sender , newcl, channel);
+    }
+}
+
+void    sendMessageThree(std::string const &msg, Channel * channel, Client *sender) {
+    std::vector<Client *> members = channel->getMembers();
+
+    std::vector<Client *>::iterator it = members.begin();
+
+    for (; it != members.end(); ++it) {
+        Client * newcl = *it;
+        if (newcl != sender)
+            UserToUserMessageChannel2(msg, sender , newcl, channel);
     }
 }

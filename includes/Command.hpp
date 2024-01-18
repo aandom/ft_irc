@@ -55,5 +55,5 @@ public:
 	void						killCommand();
 	/*********************************Sending Message*******************************/
 	void						PrivmsgCommand();
-	// **//void						noticeCommand();
+	void						noticeCommand();
 };

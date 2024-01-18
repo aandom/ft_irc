@@ -12,7 +12,7 @@ void   sendTopicAndMembers(Channel *channel, Client *client, int isname) {
         serverReply(" 332 ", topic, client);
     if (channel->checkIfMember(client->nickname))
         serverReply(" 353 ", names, client);
-    serverReply(" 366 ",  channel->getChName() + " :END of /NAMES list.", client); 
+    serverReply(" 366 ",  channel->getChName() + " :END of /NAMES list.", client);
 }
 
 void popElementsOfVector(std::vector<std::string> &input) {
@@ -47,7 +47,7 @@ void names(Server &server, Client *client, std::vector<std::string> &input) {
         while (i < chanames.size()) {
             finalinput.push_back("NAMES");
             finalinput.push_back(chanames[i]);
-            try { 
+            try {
                 namesUtils(server, client, finalinput);
             } catch (const std::exception &e) {
                 srvRplErr(e.what(), finalinput[1], client, server);
@@ -57,7 +57,7 @@ void names(Server &server, Client *client, std::vector<std::string> &input) {
         }
     }
     else {
-        try { 
+        try {
             namesUtils(server, client, input);
         } catch (const std::exception &e) {
             srvRplErr(e.what(), input[1], client, server);
@@ -65,11 +65,27 @@ void names(Server &server, Client *client, std::vector<std::string> &input) {
     }
 }
 
-// ** //void noticechannel(Server &server, Client *client, std::vector<std::string> &input) {
-//     (void)server;
-//     (void)client;
-//     (void)input;
-// }
+void noticechannel(Server &server, Client *client, std::vector<std::string> &input) {
+	Channel *channel = NULL;
+    std::string msg = "";
+    int         status;
+
+    status = checkChInput(input, 3);
+    if (status)
+		return;
+    channel = server.getChannelIfExist(input[1]);
+    if (channel == NULL) {
+		return;
+	}
+	if (!channel->checkIfMember(client->nickname))
+		return;
+    for (std::vector<std::string>::const_iterator it = input.begin() + 2; it != input.end(); it++) {
+        (it + 1) != input.end() ? msg.append(*it + " ") : msg.append(*it);
+		// msg.append(*it + " ");
+    }
+    // msg.append(*(input.begin() + 2));
+    sendMessageThree(msg, channel, client);
+}
 
 void privMsgchannel(Server &server, Client *client, std::vector<std::string> &input) {
     Channel *channel = NULL;
@@ -86,7 +102,7 @@ void privMsgchannel(Server &server, Client *client, std::vector<std::string> &in
 	if (!channel->checkIfMember(client->nickname))
 		throw std::invalid_argument(ERR_NOTONCHANNEL);
     for (std::vector<std::string>::const_iterator it = input.begin() + 2; it != input.end(); it++) {
-        (it + 1) != input.end() ? msg.append(*it + " ") : msg.append(*it); 
+        (it + 1) != input.end() ? msg.append(*it + " ") : msg.append(*it);
 		// msg.append(*it + " ");
     }
     // msg.append(*(input.begin() + 2));
@@ -111,10 +127,10 @@ void joinUtil(Server &server, Client *client, std::vector<std::string> &input) {
         channel->addAdmin(client);
     }
     status = checkModes(channel, client, input, 'i');
-    if (status) 
+    if (status)
        throw std::invalid_argument(intToStr(status));
     if (channel->checkIfMember(client->nickname))
-        return ;   
+        return ;
     channel->addClient(client);
     channel->removeFromInvitation(client);
     // printchannelmembers(channel);
@@ -144,7 +160,7 @@ void join(Server &server, Client *client, std::vector<std::string> &input) {
             }
             popElementsOfVector(finalinput);
             i++;
-        }   
+        }
     }
     else
     {
@@ -206,7 +222,7 @@ void part(Server &server, Client *client, std::vector<std::string> &input) {
             }
             popElementsOfVector(finalinput);
             i++;
-        }   
+        }
     }
     else
     {
@@ -230,7 +246,7 @@ void topic(Server &server, Client *client, std::vector<std::string> &input) {
     channel = server.getChannelIfExist(input[1]);
     if (channel == NULL) {
         throw std::invalid_argument(ERR_NOSUCHCHANNEL);
-	} 
+	}
 	if (!channel->checkIfMember(client->nickname)) {
 		throw std::invalid_argument(ERR_NOTONCHANNEL);
 	}
@@ -247,7 +263,7 @@ void topic(Server &server, Client *client, std::vector<std::string> &input) {
     new_topic = getNewTopic(input);
 	channel->setTopic(new_topic);
     sendMessage(getTopicMessage(client, input) + " :" + new_topic , channel);
-	return ; 
+	return ;
 }
 
 
@@ -317,7 +333,7 @@ void kick(Server &server, Client *client, std::vector<std::string> &input) {
 		throw std::invalid_argument((ERR_USERNOTINCHANNEL));
 	}
     reason = getReason(input, 3);
-	// send remove message to 
+	// send remove message to
     sendMessage(getKickMessage(client, input) + " " + reason , channel);
 	channel->removeClient(toBeRemoved);
     removeChannelIfnoMember(server, channel);

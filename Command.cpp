@@ -22,7 +22,7 @@ Command::Command(Server *server, Client *client, std::string str, int i) {
 	clcmds["MODE"]   = &Command::modeCommand;
 	// **
 	clcmds ["kill"]   = &Command::killCommand;
-	// clcmds["NOTICE"] = &Command::noticeCommand;
+	clcmds["NOTICE"] = &Command::noticeCommand;
 }
 
 Command::t_command Command::r_commands[] = {
@@ -50,8 +50,8 @@ Command &Command::operator=(Command const &src) {
 }
 
 void Command::NickCommand() {
-	if (client->is_registered == true)
-		return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", client));
+	// if (client->is_registered == true)
+	// 	return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", client));
 	if (client->is_authenticated == false)
 		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", client));
 	if (tokens.size() >= 2) {
@@ -104,7 +104,6 @@ void Command::killCommand() {
 			serverReplyofChannelsec(" 401 ", " " + client->nickname + " " + tokens[1] + getErrmsg(401, *server), client);
 			throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
     	}
-		std::cout << "\033[31m" << tobekilled->fd << std::endl;
 		std::string reason = tokens[2];
 		for (int i = 3; i < static_cast<int>(tokens.size()); i++)
 		{
@@ -135,9 +134,9 @@ void Command::killCommand() {
 			std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
 			sendResponse(message , tobekilled);
 			int temp_fd = tobekilled->fd;
-			std::cout << "\033[31m" << temp_fd << RESET << std::endl;
-			std::cout << this->server->nfds << std::endl;
-			int index;
+			// std::cout << "\033[31m" << temp_fd << RESET << std::endl;
+			// std::cout << this->server->nfds << std::endl;
+			int index = 0;
 			for (int i = 0; i < this->server->nfds; i++) {
 				if (this->server->fds[i].fd == temp_fd)	{
 					// std::cout << temp_fd << this->server->fds[i].fd << " and  i = " << i << std::endl;
@@ -148,7 +147,7 @@ void Command::killCommand() {
 			close(temp_fd);
 			delete tobekilled;
 			server->clients.erase(temp_fd);
-			std::cout << "closing fd = " << this->server->fds[index].fd << " and  index = " << index << std::endl;
+			// std::cout << "closing fd = " << this->server->fds[index].fd << " and  index = " << index << std::endl;
 			this->server->fds[index].fd = -1;
 			server->compress_array = true;
 		}
@@ -191,9 +190,10 @@ void Command::UserCommand() {
 
 void Command::pingCommand() {
 	if (tokens.size() >= 2)
-		serverReply("PONG", ":" + client->hostname + " " + tokens[1], client);
-	else
-		serverReply(ERR_NEEDMOREPARAMS, "PING : Need more parameters", client);
+	{
+		std::string response = "PONG #irssi\r\n";
+		send(this->client->fd, response.c_str(), response.length(), 0);
+	}
 }
 
 void Command::operCommand() {
@@ -206,6 +206,47 @@ void Command::operCommand() {
 
 	} else
 		serverReply(ERR_NEEDMOREPARAMS, "OPER : Wrong Number of parameters", client);
+}
+
+void Command::noticeCommand() {
+	if (tokens.size() >= 3)
+	{
+		std::string target = tokens[1];
+		std::string message = tokens[2];
+		if (target[0] == '#' && target[1] == '*' && client->is_operator == true)
+		{
+			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+				UserToUserMessage(message, client, it->second);
+		}
+		else if (target[0] == '#')
+			noticechannel(*server, client, tokens);
+		else if (std::strchr(target.c_str(), ','))
+		{
+			std::vector<std::string> targets = splitString(target, ',');
+			for (std::vector<std::string>::iterator it = targets.begin(); it != targets.end(); it++)
+			{
+				for (std::map<int, Client *>::iterator it2 = server->clients.begin(); it2 != server->clients.end(); it2++)
+				{
+					if (it2->second->nickname == *it)
+						UserToUserMessage(message, client, it2->second);
+				}
+			}
+		}
+		else
+		{
+			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+			{
+				if (it->second->nickname == target) {
+					UserToUserMessage(message, client, it->second);
+					return;
+				}
+			}
+		}
+	}
+	else {
+		std::cout << "returning not enough params" << std::endl;
+		serverReply(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters", client);
+	}
 }
 
 void Command::PrivmsgCommand() {
