@@ -3,7 +3,7 @@ TARGET = ircserv
 OBJ_PATH = obj
 CXX = c++
 sanitizer = -fsanitize=address -fno-omit-frame-pointer
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98  -g3
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98  -g3 $(sanitizer)
 
 pwd = $(shell pwd):/home/vscode/src
 

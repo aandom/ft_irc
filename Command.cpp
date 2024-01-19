@@ -397,7 +397,6 @@ void Command::handleException(std::string err) {
 }
 
 void Command::executeCommand() {
-	std::cout << "command: " << this->command << std::endl;
 	if (client->is_registered == false) {
 		for (int i = 0; !r_commands[i].name.empty(); i++)
 		{
