@@ -17,16 +17,16 @@ Server::Server(char *argv[]) {
 
 Server::~Server() {
 	std::cout << "Destructor Called\n";
-	for (int i = 0; i < this->nfds; i++)
+	for (int i = 1; i < this->nfds; i++)
 	{
-		if(this->fds[i].fd >= 0)
-			close_connection(this->fds[i].fd);
+		if(this->fds[i].fd > 0)
+			close_connection(i);
 		// 	close(this->fds[i].fd);
 	}
-	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
-	{
-		delete it->second;
-	}
+	// for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
+	// {
+	// 	delete it->second;
+	// }
 
 	for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 	{
@@ -71,7 +71,7 @@ void Server::init_error(std::string error) {
 void Server::init_server_address() {
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_INET;
+    hints.ai_family= AF_UNSPEC;  // Allow IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     hints.ai_protocol = IPPROTO_TCP;
@@ -142,7 +142,7 @@ void Server::ft_poll() {
 }
 
 void Server::close_connection(int i) {
-	std::cout << "Closing connection with fd: " << this->fds[i].fd << std::endl;
+	// std::cout << "Closing connection with fd: " << this->clients[this->fds[i].fd]->fd << std::endl;
 	delete this->clients[this->fds[i].fd];
 	this->clients.erase(this->fds[i].fd);
 	close(this->fds[i].fd);
@@ -151,7 +151,7 @@ void Server::close_connection(int i) {
 }
 
 void Server::accept_client () {
-	// std::cout << "  Listening socket is readable" << std::endl;
+	std::cout << "Listening socket is readable" << std::endl;
 	while (true)
 	{
 		struct sockaddr_in	new_client_addr;
@@ -159,11 +159,12 @@ void Server::accept_client () {
 
 		new_client_addr_size = sizeof(new_client_addr);
 		this->new_sd = accept(this->socket_fd, (struct sockaddr *)&new_client_addr, &new_client_addr_size);
+		std::cout << "new_sd = " << this->new_sd << std::endl;
 		if (this->new_sd < 0) {
 			if (errno != EWOULDBLOCK) {
 				perror("  accept() failed");
 				this->end_server = TRUE;
-			}
+			} 
 			return;
 		}
 		std::cout << "\033[32m Client IP: " << inet_ntoa(new_client_addr.sin_addr) << RESET << std::endl;
@@ -194,7 +195,6 @@ void Server::read_client (int i) {
 	std::cout << "Received " << this->clients[this->fds[i].fd]->str.length() << " bytes in the below string" << std::endl << this->clients[this->fds[i].fd]->str;
 	if (this->clients[this->fds[i].fd]->str.find('\n') != std::string::npos)
 	{
-		std::cout << "this is a command" << std::endl;
 		std::vector<std::string> commands = splitString(this->clients[this->fds[i].fd]->str, '\n');
 		for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); it++)
 		{
@@ -204,7 +204,7 @@ void Server::read_client (int i) {
 			if (cmd.command == "QUIT")
 				is_quit = true;
 		}
-		if (!is_quit)
+		if (!is_quit && this->clients[this->fds[i].fd]->str.empty() == false)
 			this->clients[this->fds[i].fd]->str.clear();
 	}
 	if (this->close_conn) {
@@ -215,6 +215,7 @@ void Server::read_client (int i) {
 }
 
 void Server::compress_fds () {
+	std::cout << "Compressing fds called " << std::endl;
 	this->compress_array = FALSE;
 	for (int i = 0; i < this->nfds; i++)
 	{
@@ -251,12 +252,12 @@ void Server::printClients () {
 }
 
 void Server::main_loop() {
-	while (this->end_server == FALSE)
+	while (this->end_server == FALSE && g_endServer == FALSE)
 	{
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
 		{
-			// std::cout << "fd = "<< this->fds[i].fd << "  revent value  :  " << this->fds[i].revents  << " and i = " << i << std::endl;
+			std::cout << "fd = "<< this->fds[i].fd << "  revent value  :  " << this->fds[i].revents  << " and i = " << i << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
@@ -270,7 +271,6 @@ void Server::main_loop() {
 			compress_fds();
 	}
 }
-
 
 // channel related
 void	Server::addChannel(Channel * channel) { _channels.push_back(channel); }

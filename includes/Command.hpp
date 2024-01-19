@@ -5,7 +5,6 @@
 #include "Channelcmds.hpp"
 #include <iostream>
 #include <fstream>
-#include <sstream>
 
 class Server;
 class Client;
@@ -58,5 +57,5 @@ public:
 	void						killCommand();
 	/*********************************Sending Message*******************************/
 	void						PrivmsgCommand();
-	// **//void						noticeCommand();
+	void						noticeCommand();
 };

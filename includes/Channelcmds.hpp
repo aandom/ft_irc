@@ -64,6 +64,7 @@ std::string getModeMessageTwo(Client * client, std::string chname , std::string 
 // std::string getInviteMessage(Client * client, std::vector<std::string> & input);
 std::string getMofchannel(Channel * channel);
 
+void    sendMessageThree(std::string const &msg, Channel * channel, Client *sender);
 
 
 void    sendMsg(int fd, std::string const & msg);
@@ -79,6 +80,6 @@ void names(Server &server, Client *client, std::vector<std::string> &input);
 void invite(Server &server, Client *client, std::vector<std::string> &input);
 void kick(Server &server, Client *client, std::vector<std::string> &input);
 void mode(Server &server, Client *client, std::vector<std::string> &input);
-// ** //void noticechannel(Server &server, Client *client, std::vector<std::string> &input);
+void noticechannel(Server &server, Client *client, std::vector<std::string> &input);
 
 #endif

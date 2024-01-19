@@ -48,12 +48,13 @@ class Server {
 		std::string			password;
 		std::string			operator_password;
 		struct pollfd		fds[200];
-		int					nfds;	
+		int					nfds;
 		int					on;
 		int					end_server;
 		bool				close_conn;
 		bool				compress_array;
 		std::map<int, Client *>	clients;
+		// clients[gab]
 		std::vector<std::string>	commands;
 
 		Server(char *argv[]);
