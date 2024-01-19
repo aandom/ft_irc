@@ -20,7 +20,7 @@ Server::~Server() {
 	for (int i = 1; i < this->nfds; i++)
 	{
 		if(this->fds[i].fd > 0)
-			close_connection(this->fds[i].fd);
+			close_connection(i);
 		// 	close(this->fds[i].fd);
 	}
 	// for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
@@ -71,7 +71,7 @@ void Server::init_error(std::string error) {
 void Server::init_server_address() {
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_INET;
+    hints.ai_family= AF_UNSPEC;  // Allow IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     hints.ai_protocol = IPPROTO_TCP;
@@ -151,7 +151,7 @@ void Server::close_connection(int i) {
 }
 
 void Server::accept_client () {
-	// std::cout << "  Listening socket is readable" << std::endl;
+	std::cout << "Listening socket is readable" << std::endl;
 	while (true)
 	{
 		struct sockaddr_in	new_client_addr;
@@ -159,11 +159,12 @@ void Server::accept_client () {
 
 		new_client_addr_size = sizeof(new_client_addr);
 		this->new_sd = accept(this->socket_fd, (struct sockaddr *)&new_client_addr, &new_client_addr_size);
+		std::cout << "new_sd = " << this->new_sd << std::endl;
 		if (this->new_sd < 0) {
 			if (errno != EWOULDBLOCK) {
 				perror("  accept() failed");
 				this->end_server = TRUE;
-			}
+			} 
 			return;
 		}
 		std::cout << "\033[32m Client IP: " << inet_ntoa(new_client_addr.sin_addr) << RESET << std::endl;
