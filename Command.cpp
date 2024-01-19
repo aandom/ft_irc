@@ -65,6 +65,7 @@ void Command::NickCommand() {
 			if (!client->username.empty())
 			{
 				registrationReply(client);
+				motdCommand();
 				client->is_registered = true;
 			}
 
@@ -147,7 +148,7 @@ void Command::killCommand() {
 			close(temp_fd);
 			delete tobekilled;
 			server->clients.erase(temp_fd);
-			// std::cout << "closing fd = " << this->server->fds[index].fd << " and  index = " << index << std::endl;
+			std::cout << "closing fd = " << this->server->fds[index].fd << " and  index = " << index << std::endl;
 			this->server->fds[index].fd = -1;
 			server->compress_array = true;
 		}
@@ -351,20 +352,24 @@ void Command::motdCommand() {
 	file.open(filename.c_str());
 	if (!file.is_open())
 		std::cerr << "File not created!";
-	std::stringstream buffer;
-    buffer << file.rdbuf();
-	std::string response = buffer.str();
-	file.close();
-	int ret = send(client->fd, response.c_str(), response.length(), 0);
-	if (ret == -1)
-		std::cout << "ERROR: " << strerror(errno) << std::endl;
-	/* serverReply(filename, this->client);
+	// std::stringstream buffer;
+    // buffer << file.rdbuf();
+	// std::string response = buffer.str() + "\n";
+	// file.close();
+	// int ret = send(client->fd, response.c_str(), response.length(), 0);
+	// if (ret == -1)
+	// 	std::cout << "ERROR: " << strerror(errno) << std::endl;
+	// serverReply(filename, this->client);
 	serverReply(RPL_MOTDSTART, ":- " + client->servername + " Message of the day - ", client);
 	serverReply(RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" +  \
 		client->username + "@" + client->hostname + "", client);
 	serverReply(RPL_MOTD, ":- This is a friendly community", client);
 	serverReply(RPL_MOTD, ":- This Ft_IRC server is made by: dsium, aandom, and zsyyida", client);
-	serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);*/
+	std::string line;
+    while (std::getline(file, line)) {
+        serverReply(RPL_MOTD, line, client);
+    }
+	serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);
 }
 
 void Command::quitCommand() {

@@ -1,5 +1,3 @@
-
-RPL_MOTDSTART, ":- " + client->servername + " Message of the day - "
 _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
 |_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_|
 |_|                                                                        |_|
@@ -10,9 +8,3 @@ _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
 |_|   \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/  |___|_| \_\\____| |_|
 |_| _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _ |_|
 |_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_|
-
-RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" +  \
-	client->username + "@" + client->hostname + ""
-RPL_MOTD, ":- This is a friendly community"
-RPL_MOTD, ":- This Ft_IRC server is made by: dsium, aandom, and zsyyida"
-RPL_ENDOFMOTD, ":End of MOTD command"

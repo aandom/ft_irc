@@ -142,7 +142,7 @@ void Server::ft_poll() {
 }
 
 void Server::close_connection(int i) {
-	// std::cout << "Closing connection with fd: " << this->clients[this->fds[i].fd]->fd << std::endl;
+	std::cout << "Closing connection with fd: " << this->clients[this->fds[i].fd]->fd << std::endl;
 	delete this->clients[this->fds[i].fd];
 	this->clients.erase(this->fds[i].fd);
 	close(this->fds[i].fd);
@@ -164,7 +164,7 @@ void Server::accept_client () {
 			if (errno != EWOULDBLOCK) {
 				perror("  accept() failed");
 				this->end_server = TRUE;
-			} 
+			}
 			return;
 		}
 		std::cout << "\033[32m Client IP: " << inet_ntoa(new_client_addr.sin_addr) << RESET << std::endl;
@@ -257,7 +257,7 @@ void Server::main_loop() {
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
 		{
-			std::cout << "fd = "<< this->fds[i].fd << "  revent value  :  " << this->fds[i].revents  << " and i = " << i << std::endl;
+			// std::cout << "fd = "<< this->fds[i].fd << "  revent value  :  " << this->fds[i].revents  << " and i = " << i << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
