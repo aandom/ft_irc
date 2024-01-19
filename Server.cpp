@@ -19,13 +19,12 @@ Server::~Server() {
 	std::cout << "Destructor Called\n";
 	for (int i = 1; i < this->nfds; i++)
 	{
-		if(this->fds[i].fd > 0)
-			close_connection(i);
-		// 	close(this->fds[i].fd);
+		close_connection(i);
 	}
 	// for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
 	// {
 	// 	delete it->second;
+	// 	this->clients.erase(it);
 	// }
 
 	for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
@@ -71,7 +70,7 @@ void Server::init_error(std::string error) {
 void Server::init_server_address() {
     struct addrinfo hints;
     std::memset(&hints, 0, sizeof(hints));
-    hints.ai_family= AF_UNSPEC;  // Allow IPv4 or IPv6
+    hints.ai_family= AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     hints.ai_protocol = IPPROTO_TCP;
@@ -159,7 +158,6 @@ void Server::accept_client () {
 
 		new_client_addr_size = sizeof(new_client_addr);
 		this->new_sd = accept(this->socket_fd, (struct sockaddr *)&new_client_addr, &new_client_addr_size);
-		std::cout << "new_sd = " << this->new_sd << std::endl;
 		if (this->new_sd < 0) {
 			if (errno != EWOULDBLOCK) {
 				perror("  accept() failed");
