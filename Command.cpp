@@ -137,7 +137,7 @@ void Command::killCommand() {
 			int temp_fd = tobekilled->fd;
 			std::cout << "\033[31m" << temp_fd << RESET << std::endl;
 			std::cout << this->server->nfds << std::endl;
-			int index;
+			int index = 0;
 			for (int i = 0; i < this->server->nfds; i++) {
 				if (this->server->fds[i].fd == temp_fd)	{
 					// std::cout << temp_fd << this->server->fds[i].fd << " and  i = " << i << std::endl;
@@ -304,12 +304,24 @@ void Command::modeCommand() {
 }
 
 void Command::motdCommand() {
-	serverReply(RPL_MOTDSTART, ":- " + client->servername + " Message of the day - ", client);
-	serverReply(RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" +  \
-		client->username + "@" + client->hostname + "", client);
-	serverReply(RPL_MOTD, ":- This is a friendly community", client);
-	serverReply(RPL_MOTD, ":- This Ft_IRC server is made by: dsium, aandom, and zsyyida", client);
-	serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);
+	// serverReply(RPL_MOTDSTART, ":- " + client->servername + " Message of the day - ", client);
+	// serverReply(RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" +  \
+	// 	client->username + "@" + client->hostname + "", client);
+	// serverReply(RPL_MOTD, ":- This is a friendly community", client);
+	// serverReply(RPL_MOTD, ":- This Ft_IRC server is made by: dsium, aandom, and zsyyida", client);
+	// serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);
+	std::string filename = "ircd.motd";
+	std::ifstream file;
+	file.open(filename.c_str());
+	if (!file.is_open())
+		std::cerr << "File not created!";
+	std::stringstream buffer;
+    buffer << file.rdbuf();
+	std::string response = buffer.str();
+	file.close();
+	int ret = send(client->fd, response.c_str(), response.length(), 0);
+	if (ret == -1)
+	std::cout << "ERROR: " << strerror(errno) << std::endl;
 }
 
 void Command::quitCommand() {
