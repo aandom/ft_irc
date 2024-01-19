@@ -185,6 +185,7 @@ void Command::UserCommand() {
 	{
 		this->client->is_registered = true;
 		registrationReply(client);
+		motdCommand();
 	}
 }
 
@@ -345,12 +346,25 @@ void Command::modeCommand() {
 }
 
 void Command::motdCommand() {
+	std::string filename = "ircd.motd";
+	std::ifstream file;
+	file.open(filename.c_str());
+	if (!file.is_open())
+		std::cerr << "File not created!";
+	std::stringstream buffer;
+    buffer << file.rdbuf();
+	std::string response = buffer.str();
+	file.close();
+	int ret = send(client->fd, response.c_str(), response.length(), 0);
+	if (ret == -1)
+		std::cout << "ERROR: " << strerror(errno) << std::endl;
+	/* serverReply(filename, this->client);
 	serverReply(RPL_MOTDSTART, ":- " + client->servername + " Message of the day - ", client);
 	serverReply(RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" +  \
 		client->username + "@" + client->hostname + "", client);
 	serverReply(RPL_MOTD, ":- This is a friendly community", client);
 	serverReply(RPL_MOTD, ":- This Ft_IRC server is made by: dsium, aandom, and zsyyida", client);
-	serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);
+	serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);*/
 }
 
 void Command::quitCommand() {

@@ -142,7 +142,7 @@ void Server::ft_poll() {
 }
 
 void Server::close_connection(int i) {
-	std::cout << "Closing connection with fd: " << this->clients[this->fds[i].fd]->fd << std::endl;
+	// std::cout << "Closing connection with fd: " << this->clients[this->fds[i].fd]->fd << std::endl;
 	delete this->clients[this->fds[i].fd];
 	this->clients.erase(this->fds[i].fd);
 	close(this->fds[i].fd);
