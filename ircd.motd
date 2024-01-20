@@ -8,3 +8,29 @@ _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _
 |_|   \_/\_/ \___|_|\___\___/|_| |_| |_|\___|  \__\___/  |___|_| \_\\____| |_|
 |_| _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _  _ |_|
 |_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_|
+
+00  *** Make your messages 04c07o08l09o12r06f05u01l00 ***
+
+   Prefix the message with Cntrl-CXX
+   XX = the numbers below
+
+   0000 - White      0808 - Yellow
+   0101 - Black      0909 - Light Green
+   0202 - Blue       1010 - Cyan
+   0303 - Green      1111 - Light Cyan
+   0404 - Red        1212 - Light Blue
+   0505 - Brown      1313 - Pink
+   0606 - Magenta    1414 - Grey
+   0707 - Orange     1515 - Light Grey
+
+   Cntrl-CXX,XX sets the background
+
+   0001,00 - White      0801,08 - Yellow
+   0100,01 - Black      0901,09 - Light Green
+   0201,02 - Blue       1001,10 - Cyan
+   0301,03 - Green      1101,11 - Light Cyan
+   0401,04 - Red        1201,12 - Light Blue
+   0501,05 - Brown      1301,13 - Pink
+   0601,06 - Magenta    1400,14 - Grey
+   0701,07 - Orange     1501,15 - Light Grey
+
