@@ -20,9 +20,9 @@ Command::Command(Server *server, Client *client, std::string str, int i) {
 	clcmds["PRIVMSG"] = &Command::PrivmsgCommand;
 	clcmds["WHOIS"]   = &Command::whoisCommand;
 	clcmds["MODE"]   = &Command::modeCommand;
-	// **
 	clcmds ["kill"]   = &Command::killCommand;
 	clcmds["NOTICE"] = &Command::noticeCommand;
+	clcmds["CAP"] = &Command::CapCommand;
 }
 
 Command::t_command Command::r_commands[] = {
@@ -53,13 +53,13 @@ void Command::NickCommand() {
 	// if (client->is_registered == true)
 	// 	return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", client));
 	if (client->is_authenticated == false)
-		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", client));
+		return (serverReply(ERR_PASSWDMISMATCH, ERR_PASSWDMISMATCH_MSG, client));
 	if (tokens.size() >= 2) {
 		std::string nickname = tokens[1];
 		// std::cout << "nickname: [" << nickname "]"<< std::endl;
 		if (!isUniqueNickname(nickname, this->server->clients, this->client)) {
 			std::cout << "nickname: [" << nickname << "]" << std::endl;
-			serverReply(ERR_NICKNAMEINUSE, "Nickname is already in use", client);
+			serverReply(ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, client);
 		} else {
 			client->nickname = nickname;
 			if (!client->username.empty())
@@ -71,8 +71,7 @@ void Command::NickCommand() {
 
 		}
 	} else
-		serverReply(ERR_NONICKNAMEGIVEN, "No nickname given", client);
-
+		serverReply(ERR_NONICKNAMEGIVEN, ERR_NONICKNAMEGIVEN_MSG, client);
 }
 
 void Command::CapCommand() {
@@ -88,9 +87,9 @@ void Command::CapCommand() {
 			sendResponse("CAP * ACK :multi-prefix userhost-in-names", this->client);
 		}
 		else
-			serverReply(ERR_UNKNOWNCOMMAND, "CAP : Unknown command", client);
+			serverReply(ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, client);
 	} else
-			serverReply(ERR_NEEDMOREPARAMS, "CAP : Need more parameters", client);
+			serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
 
 // // KILL <killee> <reasonto be killed>
@@ -156,29 +155,29 @@ void Command::killCommand() {
 			serverReply(ERR_NOPRIVILEGES ,ERR_NOPRIVILEGES_MSG,  client);
 	}
 	else
-		serverReply(ERR_NEEDMOREPARAMS, "\033[31m KILL : Need more parameters \033[30m", client);
+		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
 
 void Command::PassCommand() {
 	if (tokens.size() >= 2) {
 		if (client->is_registered == true)
-			return (serverReply(ERR_ALREADYREGISTERED, "You are already registered", client));
+			return (serverReply(ERR_ALREADYREGISTERED, ERR_ALREADYREGISTERED, client));
 		tokens[1] = (tokens[1].at(0) == ':') ? tokens[1].substr(1) : tokens[1];
 		if (tokens[1] == server->password)
 			client->is_authenticated = true;
 		else
-			serverReply(ERR_PASSWDMISMATCH, "Password incorrect", client);
+			serverReply(ERR_PASSWDMISMATCH, ERR_PASSWDMISMATCH_MSG, client);
 	} else
-		serverReply(ERR_NEEDMOREPARAMS, "PASS : Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
 
 void Command::UserCommand() {
 	if (this->client->is_registered == true)
-		return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", this->client));
+		return (serverReply(ERR_ALREADYREGISTERED, ERR_ALREADYREGISTERED, this->client));
 	if (tokens.size() < 5)
-		return (serverReply(ERR_NEEDMOREPARAMS, "USER : Need more parameters", this->client));
+		return (serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, this->client));
 	if (this->client->is_authenticated == false)
-		return (serverReply(ERR_PASSWDMISMATCH, "You need to give a password first", this->client));
+		return (serverReply(ERR_PASSWDMISMATCH, ERR_PASSWDMISMATCH_MSG, this->client));
 	this->client->username = tokens[1];
 	this->client->servername = tokens[3];
 	this->client->realname = tokens[4];
@@ -207,7 +206,7 @@ void Command::operCommand() {
 			serverReply(ERR_PASSWDMISMATCH, "OPER : incorrect password or host", client);
 
 	} else
-		serverReply(ERR_NEEDMOREPARAMS, "OPER : Wrong Number of parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
 
 void Command::noticeCommand() {
@@ -247,7 +246,7 @@ void Command::noticeCommand() {
 	}
 	else {
 		std::cout << "returning not enough params" << std::endl;
-		serverReply(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 	}
 }
 
@@ -289,11 +288,11 @@ void Command::PrivmsgCommand() {
 					return;
 				}
 			}
-			serverReply(ERR_NOSUCHNICK, "PRIVMSG :No such nick/channel", client);
+			serverReply(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, client);
 		}
 	}
 	else
-		serverReply(ERR_NEEDMOREPARAMS, "PRIVMSG :Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
 
 void Command::userMode() {
@@ -327,7 +326,7 @@ void Command::userMode() {
 			return;
 		}
 	}
-	serverReply(ERR_NOSUCHNICK, "MODE :No such nick/channel", client);
+	serverReply(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, client);
 }
 
 void Command::modeCommand() {
@@ -343,7 +342,7 @@ void Command::modeCommand() {
 	else if (tokens.size() >= 3)
 		userMode();
 	else
-		serverReply(ERR_NEEDMOREPARAMS, "MODE :Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
 
 void Command::motdCommand() {
@@ -352,14 +351,6 @@ void Command::motdCommand() {
 	file.open(filename.c_str());
 	if (!file.is_open())
 		std::cerr << "File not created!";
-	// std::stringstream buffer;
-    // buffer << file.rdbuf();
-	// std::string response = buffer.str() + "\n";
-	// file.close();
-	// int ret = send(client->fd, response.c_str(), response.length(), 0);
-	// if (ret == -1)
-	// 	std::cout << "ERROR: " << strerror(errno) << std::endl;
-	// serverReply(filename, this->client);
 	serverReply(RPL_MOTDSTART, ":- " + client->servername + " Message of the day - ", client);
 	serverReply(RPL_MOTD, ":- Welcome to the Internet Relay Network " + client->nickname + "!" +  \
 		client->username + "@" + client->hostname + "", client);
@@ -397,9 +388,9 @@ void Command::whoisCommand() {
 				return;
 			}
 		}
-		serverReply(ERR_NOSUCHNICK, "WHOIS :No such nick/channel", client);
+		serverReply(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, client);
 	} else {
-		serverReply(ERR_NEEDMOREPARAMS, "WHOIS :Need more parameters", client);
+		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 	}
 }
 
@@ -427,7 +418,7 @@ void Command::executeCommand() {
 					return (this->*r_commands[i].function)();
 			}
 		}
-		return (serverReply(ERR_UNKNOWNCOMMAND, "unknown command before registration", client));
+		return (serverReply(ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, client));
 	}
 	else
 	{
@@ -442,10 +433,8 @@ void Command::executeCommand() {
 			else if (this->command == "MOTD")
 				motdCommand();
 			else
-				serverReply(ERR_UNKNOWNCOMMAND, "unknown command after registration", client);
+				serverReply(ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, client);
 		} catch (std::exception &e) {
-			// std::cout << "err = [" ;
-			// std::cout <<  e.what() << "]" << std::endl;
 			handleException(e.what());
 		}
 	}
@@ -454,7 +443,7 @@ void Command::executeCommand() {
 void Command::parse_command() {
 	this->tokens = tokenizeMessage(this->str);
     if (this->tokens.empty()) {
-		serverReply(ERR_UNKNOWNCOMMAND, "Invalid message format", client);
+		serverReply(ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, client);
         return;
     }
     this->command = tokens[0];
