@@ -9,7 +9,7 @@ void sendResponse(std::string message, Client *client) {
 }
 
 void sendResponse1(std::string message, Client *client) {
-	std::string response = message + RESET + "\r\n";
+	std::string response = message + "\r\n";
 	int ret = send(client->fd, response.c_str(), response.length(), 0);
 	if (ret == -1)
 		std::cout << "ERROR: " << strerror(errno) << std::endl;

@@ -167,8 +167,8 @@ void Server::accept_client () {
 			}
 			return;
 		}
-		std::cout << "\033[32m Client IP: " << inet_ntoa(new_client_addr.sin_addr) << RESET << std::endl;
-		std::cout << "\033[32m Client fd: " << this->new_sd << RESET << std::endl;
+		std::cout << "\033[32m Client IP: " << inet_ntoa(new_client_addr.sin_addr) << std::endl;
+		std::cout << "\033[32m Client fd: " << this->new_sd << std::endl;
 		this->clients[this->new_sd] = new Client(this->new_sd, inet_ntoa(new_client_addr.sin_addr));
 		this->fds[this->nfds].fd = this->new_sd;
 		this->fds[this->nfds].events = POLLIN;
