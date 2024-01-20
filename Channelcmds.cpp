@@ -10,8 +10,25 @@ void   sendTopicAndMembers(Channel *channel, Client *client, int isname) {
     }
     if (!isname)
         serverReply(" 332 ", topic, client);
-    if (channel->checkIfMember(client->nickname))
+    if (channel->checkIfMember(client->nickname)) {
+        // int n = 1;
+        // if (nicknames.size() > 15)
+        // {
+        //     for (int i = 0; i < n * nicknames.size(); i++){
+		//         names += nicknames.at(i);
+        //         if (i == n * 15) {
+        //             serverReply(" 353 ", names, client);
+        //             n++;
+        //             names = "";
+        //         }
+	    //     }
+        //     if (!names.empty()) {
+        //         serverReply(" 353 ", names, client);
+        //     }
+        //     return ;
+        // }
         serverReply(" 353 ", names, client);
+    }
     serverReply(" 366 ",  channel->getChName() + " :END of /NAMES list.", client);
 }
 
@@ -173,8 +190,18 @@ void join(Server &server, Client *client, std::vector<std::string> &input) {
 }
 
 void removeChannelIfnoMember(Server &server, Channel *channel) {
-    if (channel->getMembers().size() == 0)
+    if (channel->getMembers().size() == 0) {
+        std::vector<Client *> _members = channel->getMembers();
+        std::vector<Client *> _admins = channel->getAdmins();
+        for (std::vector<Client *>::iterator it = _members.begin() ; it != _members.end(); ++it) {
+             _members.erase(it);
+        }
+        for (std::vector<Client *>::iterator it = _admins.begin() ; it != _admins.end(); ++it) {
+             _admins.erase(it);
+        }
         server.removeChannel(channel);
+        delete channel;
+    }
 }
 
 void partUtil(Server &server, Client *client, std::vector<std::string> &input) {
@@ -344,11 +371,6 @@ void kick(Server &server, Client *client, std::vector<std::string> &input) {
 int    tryExtractKeyMode(char sign, char m,  t_ctr & c, std::map<std::string, t_val> & nmodes, std::vector<std::string> &input) {
     t_val modepair;
     if ((sign == '+' || sign == '-') && (m == 'k' && input.size() > c.c)) {
-        // if (sign == '+') {
-        //      modepair.key = "+k";
-        // }
-        // else
-        //      modepair.key = "-k";
         modepair.key = (sign == '+') ? "+k" : "-k";
         modepair.value = input[c.c];
         nmodes[intToStr(static_cast<int>(c.idx))] = modepair;
@@ -369,12 +391,6 @@ int    tryExtractKeyMode(char sign, char m,  t_ctr & c, std::map<std::string, t_
 int    tryExtractOprMode(char sign, char m,  t_ctr & c, std::map<std::string, t_val> & nmodes, std::vector<std::string> &input) {
     t_val modepair;
     if ((sign == '+' || sign == '-') && (m == 'o' && input.size() > c.c)) {
-        // if (sign == '+') {
-        //     modepair.key = "+o";
-        // }
-        // else {
-        //     modepair.key = "-o";
-        // }
         modepair.key = (sign == '+') ? "+o" : "-o";
         modepair.value = input[c.c];
         nmodes[intToStr(static_cast<int>(c.idx))] = modepair;
@@ -388,16 +404,7 @@ int    tryExtractOprMode(char sign, char m,  t_ctr & c, std::map<std::string, t_
 int    tryExtractLimitMode(char sign, char m,  t_ctr & c, std::map<std::string, t_val> & nmodes, std::vector<std::string> &input) {
     t_val modepair;
     if ((sign == '+' || sign == '-') && (m == 'l' && input.size() > c.c)) {
-        // if (sign == '+') {
-        //     modepair.key = "+l";
-        //     modepair.value = input[c.c];
-        //     (c.c)++;
-        // }
-        // else {
-        //     modepair.key = "-l";
-        //     modepair.value = "";
-        // }
-        (sign == '+') ? (modepair.key = "+l", modepair.value = input[c.c], (c.c)++) : (modepair.key = "+l", modepair.value = "", c.c = c.c + 0);
+        (sign == '+') ? (modepair.key = "+l", modepair.value = input[c.c], (c.c)++) : (modepair.key = "-l", modepair.value = "", c.c = c.c + 0);
         nmodes[intToStr(static_cast<int>(c.idx))] = modepair;
         (c.idx)++;
         return (1);
@@ -422,6 +429,8 @@ int    tryExtractOtherMode(char sign, char m, t_ctr & c, std::map<char, bool> ch
 
 
 void    recordMode(std::string &modes, char & sign, char newsign, std::string newmode) {
+    // modes += (sign == '+' && newsign == '+') ? newmode : "";
+
     if (sign == '+' && newsign == '+') {
         modes += newmode;
     }

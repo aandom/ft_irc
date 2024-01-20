@@ -33,8 +33,8 @@ void serverReplyofChannelsec(std::string code, std::string message, Client *clie
 void srvRplErr(std::string code, std::string chname, Client *client, Server &server)
 {
 	std::string message = " " + client->nickname + " " + chname + getErrmsg(std::atoi(trimChars(code, " ").c_str()), server);
-	// std::cout << "msg = [" << message << "]" << std::endl;
-	sendResponse1(":" + client->servername + " " + code  + message + " ", client);
+	std::cout <<"code_before = [" << trimChars(code, " ") <<"] code_after_atoi = [" << std::atoi(trimChars(code, " ").c_str()) << "] msg = [" << message << "]" << std::endl;
+	sendResponse1(":" + client->servername + " " + code + message + " ", client);
 }
 
 std::vector<std::string> tokenizeMessage(std::string str) {
