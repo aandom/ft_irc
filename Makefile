@@ -38,7 +38,7 @@ push: fclean
 
 
 server: $(TARGET)
-	@valgrind ./$(TARGET) 6667 pass
+	valgrind ./$(TARGET) 6667 pass
 
 docker:
 	docker run -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --security-opt apparmor=unconfined  --network host --name 42-valgrind$(shell date '+%H%M%S') --rm -v $(pwd) valgrind "/bin/zsh"

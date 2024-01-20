@@ -55,21 +55,22 @@ size_t                  Channel::getChLimit() const {return _chLimit;}
 size_t                  Channel::getChSize() const {return _members.size();}
 
 std::vector<std::string> Channel::getNickNames(int adminIcon) {
-    std::vector<std::string> nicknames;
-    std::vector <Client *>   admins = getAdmins();
-    std::string              name;
+    std::vector<std::string> nicks;
+    std::vector<std::string> normal;
+    std::vector <Client *>   ops = getAdmins();
     ch_iterator it = _members.begin();
     ch_iterator it_end = _members.end();
     for (; it != it_end; ++it) {
         Client  * user = *it;
-        // name = (user == _admin ? "" : "") + user->nickname;
         if (adminIcon)
-            name = ((std::find(admins.begin(), admins.end(), user) != admins.end()) ? "@" : "") + user->nickname;
+            (std::find(ops.begin(), ops.end(), user) != ops.end()) ? nicks.push_back("@" + user->nickname) : normal.push_back(user->nickname);
         else
-            name = ((std::find(admins.begin(), admins.end(), user) != admins.end()) ? "" : "") + user->nickname;
-        nicknames.push_back(name);
+            nicks.push_back(user->nickname);
     }
-    return (nicknames);
+    for (std::vector<std::string>::iterator it =  normal.begin(); it != normal.end(); ++it) {
+        nicks.push_back(*it);
+    }
+    return (nicks);
 }
 
 void    Channel::setChKey(std::string key) {_chKey = key;}
@@ -77,9 +78,6 @@ void    Channel::setMode(char c, bool status) {_mode[c] = status;}
 void    Channel::setChLimit(size_t limit) {_chLimit = limit;}
 void    Channel::setTopic(std::string const & topic) { _topic = topic;}
 
-// void    Channel::broadcast(std::string msg, Client * exclude) {
-
-// }
 
 void    Channel::addClient(Client * client) { _members.push_back(client); }
 void    Channel::addAdmin(Client * client) { _admins.push_back(client); }
@@ -92,10 +90,6 @@ void    Channel::removeClient(Client * client) {
         if (*it == client) {
             if (isOperator (client) && _admins.size() == 1 && _members.size() > 1) {
                 this->removeAddmin(client);
-                // if (client != *(_members.begin()))
-                //     newadmin = *(_members.begin());
-                // else
-                //     newadmin = *(_members.begin() + 1);
                 newadmin = (client != *(_members.begin())) ? *(_members.begin()) : *(_members.begin() + 1);
                 if (newadmin != NULL)
                     this->addAdmin(newadmin);
@@ -108,7 +102,6 @@ void    Channel::removeClient(Client * client) {
         }
     }
 
-    // client->removeChannel(_chName);
     this->removeAddmin(client);
 }
 
@@ -119,7 +112,6 @@ void    Channel::removeAddmin(Client * client) {
         if (*it == client)
             _admins.erase(it);
     }
-    // client->removeChannel(_chName);
 }
 
 
@@ -161,13 +153,9 @@ void    Channel::addToInvitation(Client * client) {
 }
 
 void    Channel::removeFromInvitation(Client * client) {
-    // std::vector<int> invitees = getInvitation();
     std::vector<int>::iterator it = std::find(this->_invitations.begin(), this->_invitations.end(), client->fd);
-    if (it != this->_invitations.end())
-    {
-        std::cout << "found the fd to delete " << *it << " " << client->fd << std::endl;
+    if (it != this->_invitations.end()) {
         this->_invitations.erase(it);
-        // invitees.erase(it);
     }
 }
 
