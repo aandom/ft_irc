@@ -19,6 +19,7 @@ Command::Command(Server *server, Client *client, std::string str, int i) {
 	clcmds["OPER"]    = &Command::operCommand;
 	clcmds["PRIVMSG"] = &Command::PrivmsgCommand;
 	clcmds["WHOIS"]   = &Command::whoisCommand;
+	clcmds["WHO"]     = &Command::whoCommand;
 	clcmds["MODE"]   = &Command::modeCommand;
 	clcmds ["kill"]   = &Command::killCommand;
 	clcmds["NOTICE"] = &Command::noticeCommand;
@@ -62,6 +63,7 @@ void Command::NickCommand() {
 			serverReply(ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, client);
 		} else {
 			client->nickname = nickname;
+			sendResponse(":!@" + client->hostname + " NICK " + nickname, client);
 			if (!client->username.empty())
 			{
 				registrationReply(client);
@@ -80,14 +82,14 @@ void Command::CapCommand() {
 		std::string cap = tokens[1];
 		if (cap == "LS")
 			sendResponse(mes, this->client);
-		else if (tokens.size() >= 3 && cap == "REQ")
+		else if (cap == "REQ")
 			sendResponse("CAP * ACK " + tokens[2], this->client);
-		else if (cap == "END")
-		{
-			sendResponse("CAP * ACK :multi-prefix userhost-in-names", this->client);
-		}
-		else
-			serverReply(ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, client);
+		// else if (cap == "END")
+		// {
+		// 	sendResponse("CAP * ACK :multi-prefix userhost-in-names", this->client);
+		// }
+		// else
+		// 	serverReply(ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, client);
 	} else
 			serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
@@ -380,15 +382,48 @@ void Command::whoisCommand() {
 		for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
 		{
 			if (it->second->nickname == nickname) {
-				serverReply(RPL_WHOISUSER, nickname + " " + it->second->username + " " + it->second->hostname + " * :" + it->second->realname, client);
-				serverReply(RPL_WHOISSERVER, nickname + " " + it->second->servername + " :Ft_IRC", client);
+
+				serverReply(RPL_WHOISUSER, nickname + " ~" + it->second->username + " " + it->second->hostname + " * :" + it->second->realname, client);
 				if (it->second->is_operator == true)
 					serverReply(RPL_WHOISOPERATOR, nickname + " :is an IRC operator", client);
+				serverReply(RPL_WHOISSERVER, nickname + " " + it->second->servername + " :Ft_IRC", client);
+				serverReply(RPL_WHOISACTUALLY, nickname + " " + it->second->ip + " :Actual IP", client);
 				serverReply(RPL_ENDOFWHOIS, nickname + " :End of WHOIS list", client);
 				return;
 			}
 		}
 		serverReply(ERR_NOSUCHNICK, ERR_NOSUCHNICK_MSG, client);
+	} else {
+		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
+	}
+}
+
+void Command::whoCommand() {
+	if (this->tokens.size() >= 2) {
+		if (this->tokens[1][0] == '#'){
+			for (std::vector<Channel *>::iterator it = this->server->getChannels().begin(); it != this->server->getChannels().end(); it++)
+			{
+				if ((*it)->getChName() == tokens[1])
+				{
+					std::vector<Client *> clients = (*it)->getMembers();
+					for (std::vector<Client *>::iterator it2 = clients.begin(); it2 != clients.end(); it2++)
+					{
+						serverReply(RPL_WHOREPLY, tokens[1] + " " + (*it2)->username + " " + (*it2)->hostname + " " + (*it2)->servername + " " + (*it2)->nickname + " H :1 " + (*it2)->realname, client);
+					}
+					serverReply(RPL_ENDOFWHO, tokens[1] + " :End of WHO list", client);
+					return;
+				}
+			}
+		} 
+		else 
+		{
+			for (std::map<int, Client *>::iterator it = server->clients.begin(); it != server->clients.end(); it++)
+			{
+				if (it->second->is_registered == true && it->second->nickname == tokens[1])
+					serverReply(RPL_WHOREPLY, tokens[1] + " " + it->second->username + " " + it->second->hostname + " " + it->second->servername + " " + it->second->nickname + " H :1 " + it->second->realname, client);
+			}
+			serverReply(RPL_ENDOFWHO, tokens[1] + " :End of WHO list", client);
+		}
 	} else {
 		serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 	}
