@@ -17,7 +17,7 @@ void sendResponse1(std::string message, Client *client) {
 
 void serverReply(std::string code, std::string message, Client *client)
 {
-	sendResponse1(":" + client->servername + code + client->nickname + "!~" + client->username + "@" + client->hostname + " :" + message, client);
+	sendResponse1(":" + client->servername + code + client->nickname + " " + message, client);
 }
 
 void serverReplyofChannel(std::string code, std::string chname ,std::string message, Client *client)
