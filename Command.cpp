@@ -55,7 +55,6 @@ void Command::NickCommand() {
 		return (serverReply(ERR_PASSWDMISMATCH, ERR_PASSWDMISMATCH_MSG, client));
 	if (tokens.size() >= 2) {
 		std::string nickname = tokens[1];
-		// std::cout << "nickname: [" << nickname "]"<< std::endl;
 		if (!isUniqueNickname(nickname, this->server->clients, this->client)) {
 			std::cout << "nickname: [" << nickname << "]" << std::endl;
 			serverReply(ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, client);
@@ -88,9 +87,6 @@ void Command::CapCommand() {
 			serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
 
-// // KILL <killee> <reasonto be killed>
-// // "Closing Link: <servername> (Killed (<killer> (<reason>))) for killee
-// // "Killed (<killer> (<reason>))" for all chanels is member of
 void Command::killCommand() {
 	Client *tobekilled = NULL;
 	if (tokens.size() >= 3)
@@ -108,7 +104,6 @@ void Command::killCommand() {
 				reason += " ";
 				reason += tokens[i];
 			}
-			// send message to others that share channel 
 			std::vector<Channel *> channels = server->getChannels();
 			std::vector<Channel *>::iterator ch_iterator = channels.begin();
 			for(; ch_iterator != channels.end(); ++ch_iterator)
@@ -342,7 +337,6 @@ void Command::motdCommand() {
 }
 
 void Command::quitCommand() {
-	// sendResponse("QUIT :Bye bye", this->client);
 	std::cout << " client getting disconnected: " << client->nickname << std::endl;
 	int temp_fd = client->fd;
 	quit(*server, client);

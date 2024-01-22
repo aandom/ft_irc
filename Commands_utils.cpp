@@ -63,41 +63,8 @@ std::vector<std::string> tokenizeMessage(std::string str) {
 				tokens.push_back(*it);
 		}
 	}
-	// printVector(tokens);
 	return (tokens);
 }
-
-// std::vector<std::string> tokenizeMessage(std::string str) {
-//     std::vector<std::string> tokens;
-// 	str = trimChars(str, "\r\n");
-//     std::istringstream iss(str);
-//     std::string token;
-
-//     if (std::strchr(str.c_str(), ':'))
-// 	{
-// 		std::vector<std::string> tokensBeforeColon;
-// 		while (getline(iss, token, ':')) {
-// 			tokensBeforeColon.push_back(token);
-// 		}
-// 		if (tokensBeforeColon.size() >= 1) {
-// 			std::istringstream issBeforeColon(tokensBeforeColon[0]);
-// 			while (issBeforeColon >> token) {
-// 				tokens.push_back(token);
-// 			}
-// 			std::vector<std::string>::iterator it = tokensBeforeColon.begin();
-// 			while (++it != tokensBeforeColon.end())
-// 				tokens.push_back( ":" + *it);
-// 		} else
-// 			tokens.push_back(str);
-// 	}
-// 	else
-// 	{
-// 		while (iss >> token)
-// 			tokens.push_back(token);
-// 	}
-// 	printVector(tokens);
-//     return tokens;
-// }
 
 bool isUniqueNickname(std::string nickname, std::map<int, Client *> clients, Client *client) {
 	if (clients.empty())
@@ -112,18 +79,12 @@ bool isUniqueNickname(std::string nickname, std::map<int, Client *> clients, Cli
 	return true;
 }
 
-// void serverReplytTwo(std::string code, std::string message, Client *client)
-// {
-// 	sendResponse1(":ircserv" + code + client->nickname + "!~@127.0.0.1 " + message, client);
-// }
-
 void registrationReply(Client *client) {
 	serverReply(RPL_WELCOME, ":Welcome to the Internet Relay Network " , client);
 	serverReply(RPL_YOURHOST, ":Your host is " + client->hostname + ", running version 1.0", client);
 	serverReply(RPL_CREATED, ":This server was created sometime", client);
 	serverReply(RPL_MYINFO, ": " + client->hostname, client);
 	serverReply(RPL_ISUPPORT, "CHANMODES=,k,l,it MODES=2 MAXNICKLEN=16 NICKLEN=16 CHANNELLEN=50 CHANTYPES=#& :are supported by this server", client);
-	// ??
 	// serverReply(" 422 ", ":MOTD File is missing", client);
 }
 

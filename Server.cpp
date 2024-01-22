@@ -22,15 +22,12 @@ Server::~Server() {
 		close_connection(i);
 	}
 
-	for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
-		Channel *tobedeleted = *it;
-		delete tobedeleted;
+	for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); it++) {
+		delete (*it);
 	}
-
 	std::cout << "closing socket\n";
-	close(this->socket_fd);
-	// clear fd, client, channel,
-	// what about command objects?
+	if (close(this->socket_fd) < 0)
+		std::cout << "ERROR: " << strerror(errno) << std::endl;
 }
 
 Server::Server(Server const &src) {
@@ -228,33 +225,12 @@ void Server::compress_fds () {
 	}
 }
 
-void Server::printClients () {
-	for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
-	{
-		std::cout << "fd: " << it->second->fd << std::endl;
-		std::cout << "nickname: " << it->second->nickname << std::endl;
-		std::cout << "username: " << it->second->username << std::endl;
-		std::cout << "realname: " << it->second->realname << std::endl;
-		std::cout << "hostname: " << it->second->hostname << std::endl;
-		std::cout << "servername: " << it->second->servername << std::endl;
-		std::cout << "client_ip: " << it->second->client_ip << std::endl;
-		std::cout << "is_registered: " << it->second->is_registered << std::endl;
-		std::cout << "away: " << it->second->away << std::endl;
-		std::cout << "mode: " << it->second->mode << std::endl;
-		std::cout << "ip: " << it->second->ip << std::endl;
-		std::cout << "is_authenticated: " << it->second->is_authenticated << std::endl;
-		std::cout << "is_operator: " << it->second->is_operator << std::endl;
-		std::cout << std::endl;
-	}
-}
-
 void Server::main_loop() {
 	while (this->end_server == FALSE && g_endServer == FALSE)
 	{
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
 		{
-			// std::cout << "fd = "<< this->fds[i].fd << "  revent value  :  " << this->fds[i].revents  << " and i = " << i << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
