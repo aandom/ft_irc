@@ -194,8 +194,7 @@ void join(Server &server, Client *client, std::vector<std::string> &input) {
     }
 }
 
-void removeChannelIfnoMember(Server &server, Channel *channel) {
-    if (channel->getMembers().size() == 0) {
+void removeChannelMembers(Channel * channel) {
         std::vector<Client *> _members = channel->getMembers();
         std::vector<Client *> _admins = channel->getAdmins();
         for (std::vector<Client *>::iterator it = _members.begin() ; it != _members.end(); ++it) {
@@ -204,6 +203,19 @@ void removeChannelIfnoMember(Server &server, Channel *channel) {
         for (std::vector<Client *>::iterator it = _admins.begin() ; it != _admins.end(); ++it) {
              _admins.erase(it);
         }
+}
+
+void removeChannelIfnoMember(Server &server, Channel *channel) {
+    if (channel->getMembers().size() == 0) {
+        // std::vector<Client *> _members = channel->getMembers();
+        // std::vector<Client *> _admins = channel->getAdmins();
+        // for (std::vector<Client *>::iterator it = _members.begin() ; it != _members.end(); ++it) {
+        //      _members.erase(it);
+        // }
+        // for (std::vector<Client *>::iterator it = _admins.begin() ; it != _admins.end(); ++it) {
+        //      _admins.erase(it);
+        // }
+        removeChannelMembers(channel);
         server.removeChannel(channel);
         delete channel;
     }

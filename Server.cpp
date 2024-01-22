@@ -22,11 +22,11 @@ Server::~Server() {
 		close_connection(i);
 	}
 
-	for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
-	{
-		delete *it;
-		this->_channels.erase(it);
+	for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
+		Channel *tobedeleted = *it;
+		delete tobedeleted;
 	}
+
 	std::cout << "closing socket\n";
 	close(this->socket_fd);
 	// clear fd, client, channel,

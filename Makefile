@@ -3,7 +3,7 @@ TARGET = ircserv
 OBJ_PATH = obj
 CXX = c++
 sanitizer = -fsanitize=address -fno-omit-frame-pointer
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98  -g3 #$(sanitizer)
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98  -g3 # $(sanitizer)
 leak = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 pwd = $(shell pwd):/home/vscode/src

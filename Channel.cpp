@@ -42,7 +42,9 @@ Channel &Channel::operator=(const Channel & src) {
 }
 
 
-Channel::~Channel() {}
+Channel::~Channel() {
+    // removeChannelMembers(this);
+}
 
 std::string const &     Channel::getChName() const { return _chName;}
 std::vector <Client *>  Channel::getAdmins() const {return _admins;}
