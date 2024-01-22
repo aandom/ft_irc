@@ -1,3 +1,3 @@
 # References
 
-https://modern.ircdocs.horse/
+1. https://modern.ircdocs.horse/
