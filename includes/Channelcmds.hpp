@@ -49,6 +49,8 @@ int checkChannelName(std::string & chname, int *status);
 int checkChInput(std::vector<std::string> & input, size_t minpars);
 int checkModes(Channel * channel, Client * client, std::vector<std::string> & input, char checkfor);
 
+std::string getQuitMessage(Client * client);
+
 std::string getJoinMessage(Client * client, std::vector<std::string> & input);
 std::string getNewTopic(std::vector<std::string> & input);
 std::string getPartMessage(Client * client, std::vector<std::string> & input);
@@ -81,5 +83,7 @@ void invite(Server &server, Client *client, std::vector<std::string> &input);
 void kick(Server &server, Client *client, std::vector<std::string> &input);
 void mode(Server &server, Client *client, std::vector<std::string> &input);
 void noticechannel(Server &server, Client *client, std::vector<std::string> &input);
+
+void quit(Server &server, Client *client);
 
 #endif
