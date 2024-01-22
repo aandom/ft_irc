@@ -4,6 +4,7 @@ OBJ_PATH = obj
 CXX = c++
 sanitizer = -fsanitize=address -fno-omit-frame-pointer
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98  -g3 #$(sanitizer)
+leak = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 pwd = $(shell pwd):/home/vscode/src
 
@@ -38,7 +39,7 @@ push: fclean
 
 
 server: $(TARGET)
-	valgrind ./$(TARGET) 6667 pass
+	$(leak) ./$(TARGET) 6667 pass
 
 docker:
 	docker run -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --security-opt apparmor=unconfined  --network host --name 42-valgrind$(shell date '+%H%M%S') --rm -v $(pwd) valgrind "/bin/zsh"
