@@ -4,30 +4,35 @@ void   sendTopicAndMembers(Channel *channel, Client *client, int isname) {
     std::string topic = channel->getChName();
     topic = topic + " :" + channel->getTopic();
     std::string names = "= " + channel->getChName() + " :";
+    std::string chnames = "";
     std::vector<std::string> nicknames = channel->getNickNames(1);
-    for(std::vector<std::string>::iterator it = nicknames.begin(); it != nicknames.end(); ++it) {
-        names = names + *it + " ";
-    }
+    // for(std::vector<std::string>::iterator it = nicknames.begin(); it != nicknames.end(); ++it) {
+    //     names = names + *it + " ";
+    // }
     if (!isname)
         serverReply(" 332 ", topic, client);
     if (channel->checkIfMember(client->nickname)) {
-        // int n = 1;
-        // if (nicknames.size() > 15)
-        // {
-        //     for (int i = 0; i < n * nicknames.size(); i++){
-		//         names += nicknames.at(i);
-        //         if (i == n * 15) {
-        //             serverReply(" 353 ", names, client);
-        //             n++;
-        //             names = "";
-        //         }
-	    //     }
-        //     if (!names.empty()) {
-        //         serverReply(" 353 ", names, client);
-        //     }
-        //     return ;
-        // }
-        serverReply(" 353 ", names, client);
+        size_t n = 1;
+        if (nicknames.size() > 15)
+        {
+            for (size_t i = 0; i < nicknames.size(); i++){
+		        chnames = chnames +  nicknames.at(i) + " ";
+                if (i == n * 15) {
+                    serverReply(" 353 ", names +  chnames, client);
+                    n++;
+                    chnames = "";
+                }
+	        }
+            if (!chnames.empty()) {
+                serverReply(" 353 ", names + chnames, client);
+            }
+        }
+        else {
+            for(std::vector<std::string>::iterator it = nicknames.begin(); it != nicknames.end(); ++it) {
+                names = names + *it + " ";
+            }
+            serverReply(" 353 ", names, client);
+        }
     }
     serverReply(" 366 ",  channel->getChName() + " :END of /NAMES list.", client);
 }
@@ -203,6 +208,20 @@ void removeChannelIfnoMember(Server &server, Channel *channel) {
         delete channel;
     }
 }
+
+void quit(Server &server, Client *client) {
+    std::vector<Channel *> channels = server.getChannels();
+
+    for (std::vector<Channel *>::iterator it = channels.begin(); it != channels.end(); ++it) {
+        if ((*it)->checkIfMember(client->nickname)) {
+            std::string chname = "" + (*it)->getChName();
+            sendMessage(getQuitMessage(client), *it);
+            (*it)->removeClient(client);
+            removeChannelIfnoMember(server, *it);
+        }
+    }
+}
+
 
 void partUtil(Server &server, Client *client, std::vector<std::string> &input) {
     Channel *channel = NULL;

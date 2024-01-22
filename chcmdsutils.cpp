@@ -117,6 +117,13 @@ std::string getJoinMessage(Client * client, std::vector<std::string> & input) {
     return (res);
 }
 
+std::string getQuitMessage(Client * client) {
+    std::string res;
+    res = ":" + client->nickname + "!" + client->username + "@" + client->client_ip \
+              + " QUIT " + "Quit: leaving";
+    return (res);
+}
+
 std::string getNewTopic(std::vector<std::string> & input) {
     std::string new_topic = "";
 	for (std::vector<std::string>::iterator it = input.begin() + 2; it != input.end(); it++) {

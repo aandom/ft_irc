@@ -367,6 +367,7 @@ void Command::quitCommand() {
 	// sendResponse("QUIT :Bye bye", this->client);
 	std::cout << " client getting disconnected: " << client->nickname << std::endl;
 	int temp_fd = client->fd;
+	quit(*server, client);
 	delete client;
 	server->clients.erase(temp_fd);
 	close(temp_fd);
