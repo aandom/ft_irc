@@ -105,7 +105,10 @@ void Server::bind_socket() {
 // Starts listening for incoming connections on the socket
 void Server::start_listening() {
     if (listen(this->socket_fd, 10) < 0)
+	{
         init_error("listen() failed");
+	}
+	std::cout << GREEN << "Server listening on all networks on port " << this->port << RESET << std::endl;
 }
 
 // Initializes the poll array with the socket for later use in poll()
@@ -165,8 +168,8 @@ void Server::accept_client () {
 			}
 			return;
 		}
-		std::cout << "\033[32m Client IP: " << inet_ntoa(new_client_addr.sin_addr) << RESET << std::endl;
-		std::cout << "\033[32m Client fd: " << this->new_sd << RESET << std::endl;
+		std::cout << "\033[32mClient IP: " << inet_ntoa(new_client_addr.sin_addr) << RESET << std::endl;
+		std::cout << "\033[32mClient fd: " << this->new_sd << RESET << std::endl;
 		this->clients[this->new_sd] = new Client(this->new_sd, inet_ntoa(new_client_addr.sin_addr));
 		this->fds[this->nfds].fd = this->new_sd;
 		this->fds[this->nfds].events = POLLIN;

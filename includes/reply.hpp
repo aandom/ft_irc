@@ -1,7 +1,9 @@
 #pragma once
 
-// #define BLUE "\033[1;30m"
-// #define MAGENTA "\033[1;35m"
+#define BLUE "\033[1;30m"
+#define MAGENTA "\033[1;35m"
+#define GREEN "\033[1;32m"
+#define RESET "\033[0m"
 
 #define RPL_WELCOME			" 001 "
 #define RPL_YOURHOST		" 002 "
@@ -26,3 +28,5 @@
 #define RPL_ENDOFMOTD 		" 376 "
 #define RPL_WHOISHOST 		" 378 "
 #define RPL_YOUREOPER 		" 381 "
+#define RPL_WHOREPLY 		" 352 "
+#define RPL_ENDOFWHO 		" 315 "

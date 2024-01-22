@@ -51,6 +51,7 @@ public:
 	void						motdCommand();
 	void						quitCommand();
 	void 						whoisCommand();
+	void 						whoCommand();
 	void						modeCommand();
 	void 						userMode();
 	// **

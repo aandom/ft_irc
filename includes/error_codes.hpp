@@ -4,8 +4,6 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
-# define RESET "\033[0m"
-# define RED "\033[31m"
 
 #define ERR_NOSUCHNICK " 401 "
 #define ERR_NOSUCHSERVER " 402 "

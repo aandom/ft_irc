@@ -36,10 +36,11 @@ push: fclean
 	git commit -m " $(shell date +'%Y-%m-%d %H:%M:%S') by $(shell whoami)"
 	git push -u origin master
 
-.PHONY: all clean fclean re push
 
 server: $(TARGET)
 	valgrind ./$(TARGET) 6667 pass
 
 docker:
 	docker run -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined --security-opt apparmor=unconfined  --network host --name 42-valgrind$(shell date '+%H%M%S') --rm -v $(pwd) valgrind "/bin/zsh"
+
+.PHONY: all clean fclean re push docker server
