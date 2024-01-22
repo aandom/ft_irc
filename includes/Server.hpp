@@ -17,8 +17,10 @@
 #include <netdb.h>
 #include <poll.h>
 #include <vector>
+#include <algorithm>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include "Client.hpp"
 #include "Command.hpp"
 #include "error_codes.hpp"
@@ -28,6 +30,7 @@
 #include "Channelcmds.hpp"
 #include "servError.hpp"
 #include <cstdio>
+
 
 #define TRUE             1
 #define FALSE            0

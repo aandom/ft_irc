@@ -51,8 +51,6 @@ Command &Command::operator=(Command const &src) {
 }
 
 void Command::NickCommand() {
-	// if (client->is_registered == true)
-	// 	return (serverReply(ERR_ALREADYREGISTERED, "You may not reregister", client));
 	if (client->is_authenticated == false)
 		return (serverReply(ERR_PASSWDMISMATCH, ERR_PASSWDMISMATCH_MSG, client));
 	if (tokens.size() >= 2) {
@@ -61,9 +59,11 @@ void Command::NickCommand() {
 		if (!isUniqueNickname(nickname, this->server->clients, this->client)) {
 			std::cout << "nickname: [" << nickname << "]" << std::endl;
 			serverReply(ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, client);
-		} else {
+		} else 
+		{
+			if (nickname.size() > 16)
+				nickname = nickname.substr(0, 16);
 			client->nickname = nickname;
-			sendResponse(":!@" + client->hostname + " NICK " + nickname, client);
 			if (!client->username.empty())
 			{
 				registrationReply(client);
@@ -77,19 +77,13 @@ void Command::NickCommand() {
 }
 
 void Command::CapCommand() {
-	std::string mes = "CAP * LS :multi-prefix userhost-in-names";
+	std::string mes = " CAP * LS :multi-prefix userhost-in-names invite-notify";
 	if (tokens.size() >= 2) {
 		std::string cap = tokens[1];
 		if (cap == "LS")
 			sendResponse(mes, this->client);
 		else if (cap == "REQ")
-			sendResponse("CAP * ACK " + tokens[2], this->client);
-		// else if (cap == "END")
-		// {
-		// 	sendResponse("CAP * ACK :multi-prefix userhost-in-names", this->client);
-		// }
-		// else
-		// 	serverReply(ERR_UNKNOWNCOMMAND, ERR_UNKNOWNCOMMAND_MSG, client);
+			sendResponse(" CAP * ACK :" + tokens[2], this->client);
 	} else
 			serverReply(ERR_NEEDMOREPARAMS, ERR_NEEDMOREPARAMS_MSG, client);
 }
@@ -106,13 +100,6 @@ void Command::killCommand() {
 			serverReplyofChannelsec(" 401 ", " " + client->nickname + " " + tokens[1] + getErrmsg(401, *server), client);
 			throw std::invalid_argument(ERR_NOSUCHCHANNEL_MSG);
     	}
-		std::string reason = tokens[2];
-		for (int i = 3; i < static_cast<int>(tokens.size()); i++)
-		{
-			reason += " ";
-			reason += tokens[i];
-		}
-		std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
 		if (this->client->is_operator )
 		{
 			std::string reason = tokens[2];
@@ -121,7 +108,7 @@ void Command::killCommand() {
 				reason += " ";
 				reason += tokens[i];
 			}
-			// send message to others that share channel
+			// send message to others that share channel 
 			std::vector<Channel *> channels = server->getChannels();
 			std::vector<Channel *>::iterator ch_iterator = channels.begin();
 			for(; ch_iterator != channels.end(); ++ch_iterator)
@@ -132,26 +119,15 @@ void Command::killCommand() {
 					(*ch_iterator)->removeClient(tobekilled);
 				}
 			}
-			// send msg to killee
-			std::string message = "\033[33m Closing Link:" + client->servername + " KILLED " + tokens[1] + " by " + client->nickname + " because of " + reason;
-			sendResponse(message , tobekilled);
 			int temp_fd = tobekilled->fd;
-			// std::cout << "\033[31m" << temp_fd << RESET << std::endl;
-			// std::cout << this->server->nfds << std::endl;
 			int index = 0;
 			for (int i = 0; i < this->server->nfds; i++) {
 				if (this->server->fds[i].fd == temp_fd)	{
-					// std::cout << temp_fd << this->server->fds[i].fd << " and  i = " << i << std::endl;
 					index = i;
 					break;
 				}
 			}
-			close(temp_fd);
-			delete tobekilled;
-			server->clients.erase(temp_fd);
-			std::cout << "closing fd = " << this->server->fds[index].fd << " and  index = " << index << std::endl;
-			this->server->fds[index].fd = -1;
-			server->compress_array = true;
+			this->server->close_connection(index);
 		}
 		else
 			serverReply(ERR_NOPRIVILEGES ,ERR_NOPRIVILEGES_MSG,  client);
@@ -194,8 +170,8 @@ void Command::UserCommand() {
 void Command::pingCommand() {
 	if (tokens.size() >= 2)
 	{
-		std::string response = "PONG #irssi\r\n";
-		send(this->client->fd, response.c_str(), response.length(), 0);
+		std::string response = " PONG " + tokens[1] + ": " + client->servername;
+		sendResponse(response, this->client);
 	}
 }
 

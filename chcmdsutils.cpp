@@ -227,7 +227,12 @@ void    sendMessage(std::string const &msg, Channel * channel) {
     for (; it != members.end(); ++it) {
       // send the message to the client;
       Client * newcl = *it;
-      sendResponse(msg, newcl);
+      std::string response = msg + "\r\n";
+      if (send(newcl->fd, response.c_str(), response.length(), 0) == -1)
+        std::cout << "ERROR: " << strerror(errno) << std::endl;
+    //   send(newcl->fd, response.c_str(), msg.length(), 0);
+
+    //   sendResponse(msg, newcl);
     //   sendMsg((*it)->fd, msg);
     }
 }

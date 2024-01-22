@@ -13,12 +13,6 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-# include <iostream>
-# include <string>
-# include <stdexcept>
-# include <map>
-# include <algorithm>
-# include <vector>
 # include "Client.hpp"
 # include "Server.hpp"
 

@@ -2,7 +2,7 @@
 #include "includes/Channelcmds.hpp"
 
 void sendResponse(std::string message, Client *client) {
-	std::string response = message + "\r\n";
+	std::string response = ":" + client->hostname + message + "\r\n";
 	int ret = send(client->fd, response.c_str(), response.length(), 0);
 	if (ret == -1)
 		std::cout << "ERROR: " << strerror(errno) << std::endl;
@@ -17,7 +17,7 @@ void sendResponse1(std::string message, Client *client) {
 
 void serverReply(std::string code, std::string message, Client *client)
 {
-	sendResponse1(":" + client->servername + code + client->nickname + " " + message, client);
+	sendResponse1(":" + client->hostname + code + client->nickname + " " + message, client);
 }
 
 void serverReplyofChannel(std::string code, std::string chname ,std::string message, Client *client)

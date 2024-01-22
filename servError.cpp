@@ -1,4 +1,4 @@
-# include "includes/servError.hpp"
+#include "includes/servError.hpp"
 
 ErrorCode::ErrorCode() {
 

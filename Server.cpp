@@ -21,15 +21,11 @@ Server::~Server() {
 	{
 		close_connection(i);
 	}
-	// for (std::map<int, Client *>::iterator it = this->clients.begin(); it != this->clients.end(); it++)
-	// {
-	// 	delete it->second;
-	// 	this->clients.erase(it);
-	// }
 
 	for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 	{
 		delete *it;
+		this->_channels.erase(it);
 	}
 	std::cout << "closing socket\n";
 	close(this->socket_fd);
