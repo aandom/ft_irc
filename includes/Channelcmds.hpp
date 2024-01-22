@@ -86,4 +86,6 @@ void noticechannel(Server &server, Client *client, std::vector<std::string> &inp
 
 void quit(Server &server, Client *client);
 
+void removeChannelMembers(Channel * channel);
+
 #endif
