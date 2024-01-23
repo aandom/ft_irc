@@ -34,6 +34,7 @@
 #define ERR_UMODEUNKOWNFLAG     " 501 "
 #define ERR_USERSDONTMATCH      " 502 "
 #define ERR_KEYSET              " 467 "
+#define ERR_INVALIDMODEPARAM    " 696 " 
 
 
 #define ERR_NOSUCHNICK_MSG          " :No such nick/channel "
@@ -69,4 +70,10 @@
 #define RPL_NOTOPIC_MSG             " :No topic is set"
 #define RPL_INVITING_MSG            " has been invited to "
 #define ERR_KEYSET_MSG              " :Channel key already set"
+#define ERR_INVALIDMODEPARAM        " 696 "
+
+#define NOTENOUGH_OPPARAM            " :o * You must specify a parameter for the op mode. Syntax: <nick>."
+#define NOTENOUGH_KEYPARAM           " :k * You must specify a parameter for the key mode. Syntax: <key>."
+#define NOTENOUGH_LIMPARAM           " :l * You must specify a parameter for the limit mode. Syntax: <limit>."
+#define INVALID_LIMIT           " Invalid limit mode parameter. Syntax: <limit>."
 

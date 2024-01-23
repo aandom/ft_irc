@@ -97,13 +97,8 @@ void    Channel::removeClient(Client * client) {
                     this->addAdmin(newadmin);
             }
             _members.erase(it);
-            if (_members.size() == 0)
-            {
-                std::cout << "YOU MIGHT NEED TO DELETE THE CHANNEL AT THIS POINT" << std::endl;
-            }
         }
     }
-
     this->removeAddmin(client);
 }
 

@@ -42,6 +42,22 @@ std::string trimChars(std::string str, const std::string tobetrimed) {
 	return (rightTrim(leftTrim(str, tobetrimed), tobetrimed));
 }
 
+bool allDigits(std::string str) {
+    if (str.size() == 1 &&  (str.at(0) == '+' || str.at(0) == '-'))
+        return (false);
+    for (std::string::const_iterator it = str.begin(); it != str.end(); it++) {
+		if (it == str.begin() &&  *it == '+')
+			continue;
+		else if (it == str.begin() && (*it == '-'))
+			return (false);
+		else if (!std::isdigit(*it) && *it != '.') {
+			return (false);
+		}
+	}
+    if (std::strtol(str.c_str(), NULL, 10) == 0) 
+        return (false);
+	return (true); 
+}
 
 std::vector<std::string> splitStringTwo(std::string str, char delim) {
     std::vector<std::string> res;

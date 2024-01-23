@@ -27,6 +27,7 @@ typedef struct s_val
 {
     std::string key;
     std::string value;
+    std::string nick;
 } t_val;
 
 typedef struct s_ctr
@@ -87,5 +88,6 @@ void noticechannel(Server &server, Client *client, std::vector<std::string> &inp
 void quit(Server &server, Client *client);
 
 void removeChannelMembers(Channel * channel);
+bool allDigits(std::string str);
 
 #endif
