@@ -56,7 +56,6 @@ void Command::NickCommand() {
 	if (tokens.size() >= 2) {
 		std::string nickname = tokens[1];
 		if (!isUniqueNickname(nickname, this->server->clients, this->client)) {
-			std::cout << "nickname: [" << nickname << "]" << std::endl;
 			serverReply(ERR_NICKNAMEINUSE, ERR_NICKNAMEINUSE_MSG, client);
 		} else 
 		{
@@ -122,6 +121,8 @@ void Command::killCommand() {
 					break;
 				}
 			}
+			std::string msg = " you have been killed by " + client->nickname + " because of " + reason;
+			sendResponse(msg, tobekilled);
 			this->server->close_connection(index);
 		}
 		else

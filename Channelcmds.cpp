@@ -586,7 +586,6 @@ void tryApplyMode(Server &server, Client *client, Channel *channel, std::vector<
     char sign = 'n';
     int res = 0;
     for (; cit != nmodes.end(); cit++) {
-        std::cout << cit->second.key << " - " << cit->second.value << std::endl;
         if ((res = applyOprMode(server, channel, (cit->second), appliedmode, values, sign)) & 1) {
             if (res > 1)
                 serverReplyofChannelsec(" " + intToStr(res) + " ", " " + client->nickname + " " + cit->second.value + getErrmsg(res, server), client);

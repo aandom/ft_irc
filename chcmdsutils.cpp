@@ -54,8 +54,9 @@ bool allDigits(std::string str) {
 			return (false);
 		}
 	}
-    if (std::strtol(str.c_str(), NULL, 10) == 0) 
+    if (std::strtol(str.c_str(), NULL, 10) == 0) {
         return (false);
+    } 
 	return (true); 
 }
 
@@ -153,7 +154,6 @@ std::string getNewTopic(std::vector<std::string> & input) {
 	if (new_topic.size() == 1) {
 		new_topic = "";
 	}
-    std::cout << "new_topic_1 [" << new_topic << "]" << std::endl;
     return (new_topic);
 }
 

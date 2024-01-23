@@ -8,7 +8,7 @@ leak = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 pwd = $(shell pwd):/home/vscode/src
 
-SRCS = main.cpp Server.cpp Client.cpp Command.cpp Commands_utils.cpp Channelcmds.cpp Channel.cpp servError.cpp chcmdsutils.cpp
+SRCS = main.cpp Server.cpp Client.cpp Command.cpp Commands_utils.cpp Channelcmds.cpp Channel.cpp servError.cpp chcmdsutils.cpp init_socket.cpp
 
 OBJS = $(patsubst %.cpp,$(OBJ_PATH)/%.o,$(SRCS))
 
@@ -35,8 +35,7 @@ re: clean all
 push: fclean
 	git add .
 	git commit -m " $(shell date +'%Y-%m-%d %H:%M:%S') by $(shell whoami)"
-	git push -u origin master
-
+	git push -u origin 42 master 
 
 server: $(TARGET)
 	$(leak) ./$(TARGET) 6667 pass
