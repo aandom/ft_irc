@@ -35,7 +35,7 @@ re: clean all
 push: fclean
 	git add .
 	git commit -m " $(shell date +'%Y-%m-%d %H:%M:%S') by $(shell whoami)"
-	git push -u origin 42 master 
+	git push -u origin master 
 
 server: $(TARGET)
 	$(leak) ./$(TARGET) 6667 pass
