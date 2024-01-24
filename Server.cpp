@@ -1,5 +1,7 @@
 #include "includes/Server.hpp"
-
+/*##############################################################################################################
+ 												SERVER CONSTRUCTOR
+###############################################################################################################*/
 Server::Server(char *argv[]) {
 	this->socket_fd = -1;
 	this->port = std::atoi(argv[1]);
@@ -51,8 +53,10 @@ Server &Server::operator=(Server const &src) {
 	return *this;
 }
 
+/*##############################################################################################################
+ 													POLL EVENTS
+###############################################################################################################*/
 void Server::ft_poll() {
-	// std::cout << "Waiting on poll()..." << std::endl;
 	this->rc = poll(this->fds, this->nfds, -1);
 	if (this->rc < 0)	{
 		perror(" at poll()");
@@ -75,7 +79,6 @@ void Server::close_connection(int i) {
 }
 
 void Server::accept_client () {
-	// std::cout << "Listening socket is readable" << std::endl;
 	while (true)
 	{
 		struct sockaddr_in	new_client_addr;
@@ -114,7 +117,6 @@ void Server::read_client (int i) {
 		this->close_connection(i);
 		return;
 	}
-	// std::cout << "Received " << this->clients[this->fds[i].fd]->str.length() << " bytes in the below string" << std::endl << this->clients[this->fds[i].fd]->str;
 	if (this->clients[this->fds[i].fd]->str.find('\n') != std::string::npos)
 	{
 		std::vector<std::string> commands = splitString(this->clients[this->fds[i].fd]->str, '\n');
@@ -132,7 +134,6 @@ void Server::read_client (int i) {
 }
 
 void Server::compress_fds () {
-	// std::cout << "Compressing fds called " << std::endl;
 	this->compress_array = FALSE;
 	for (int i = 0; i < this->nfds; i++)
 	{
@@ -154,14 +155,8 @@ void Server::main_loop() {
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
 		{
-			std::cout << "fd = " << this->fds[i].fd << " events = " << this->fds[i].revents << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
-			else if (this->fds[i].revents == (POLLIN | POLLHUP))
-			{
-				std::cout << "this is close connection in main loop " << std::endl;
-				close_connection(i);
-			}
 			else if (this->fds[i].fd == this->socket_fd)
 				accept_client();
 			else
@@ -172,7 +167,9 @@ void Server::main_loop() {
 	}
 }
 
-// channel related
+/*##############################################################################################################
+ 													CHANNEL RELATED
+###############################################################################################################*/
 void	Server::addChannel(Channel * channel) { _channels.push_back(channel); }
 
 std::vector<Channel *> & Server::getChannels() { return _channels;}

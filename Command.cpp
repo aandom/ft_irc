@@ -337,15 +337,9 @@ void Command::motdCommand() {
 	serverReply(RPL_ENDOFMOTD, ":End of MOTD command", client);
 }
 
-void Command::quitCommand() {
-	std::cout << " client getting disconnected: " << client->nickname << std::endl;
-	int temp_fd = client->fd;
-	quit(*server, client);
-	delete client;
-	server->clients.erase(temp_fd);
-	close(temp_fd);
-	this->server->fds[this->i].fd = -1;
-	server->compress_array = true;
+void Command::quitCommand() 
+{
+	server->close_connection(i);
 }
 
 void Command::whoisCommand() {
