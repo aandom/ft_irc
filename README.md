@@ -11,12 +11,20 @@
 irssi
 /set nick <name>
 /set user_name <user name>
+/set server_reconnect_time -1
 /set real_name <real_name>
 /connect localhost <port> <password>
+
+### Start Server in Docker
+make docker
+make re
+make server
 ```
 ### Start Client in Docker
 ```bash
-docker run -it --rm --name irssi --network host irssi
+make docker
+irssi
+(docker run -it --rm --name irssi --network host irssi)
 /set nick <name>
 /set user_name <user name>
 /set real_name <real_name>
@@ -27,7 +35,8 @@ docker run -it --rm --name irssi --network host irssi
 /oper 127.0.0.1 pa$$word  # Shows @ operator name
 /kill <nick> reason
 /join <channel>{,<channel>} [<key>{,<key>}]
-/msg <nick> <message>
+/msg <nick or channel> <message>
+/notice <nick or channel> <message>
 /kick channel, channel user, user reason
 /part <channel>{,<channel>} [<reason>]
 /topic <channel> : [<topic>]
@@ -46,6 +55,7 @@ USER <username> 0 <localhost> :<first_name last_name>
 ### Commands Locally
 ```bash
 PRIVMSG <nick to be sent to> : message
+NOTICE <nick to be sent to> : message
 JOIN <channel>{,<channel>} [<key>{,<key>}]
 KICK channel, channel user, user reason
 PART <channel>{,<channel>} [<reason>]
@@ -64,7 +74,9 @@ DISCONNECT
 
 Purpose: Resolves a hostname and service into address structures.
 
+getaddrinfo(NULL, intToStr(this->port).c_str(), &hints, &this->address
 Parameters:
+
 - `node`: The hostname or IP address.
 - `service`: The service name or port number.
 - `hints`: A pointer to an `addrinfo` structure with hints.
@@ -75,6 +87,8 @@ Return: Returns 0 on success, non-zero on error.
 ### `socket`
 
 Purpose: Creates a new socket.
+
+this->socket_fd = socket(this->address->ai_family, this->address->ai_socktype, this->address->ai_protocol)
 
 Parameters:
 - `domain`: The protocol family (e.g., AF_INET for IPv4, AF_INET6 for IPv6).
@@ -155,3 +169,4 @@ Return: Returns 0 on success, -1 on error.
 ## References
 
 1. https://modern.ircdocs.horse/
+2. https://www.rfc-editor.org
