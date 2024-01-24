@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/Channel.hpp"
+#include "../includes/Channel.hpp"
 
 Channel::Channel(std::string &name, std::string &key) : _chName(name),
                                                         _chKey(key),

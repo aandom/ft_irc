@@ -1,4 +1,4 @@
-#include "includes/Server.hpp"
+#include "../includes/Server.hpp"
 #include <csignal>
 
 int g_endServer = FALSE;

@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 TARGET = ircserv
 OBJ_PATH = obj
+SRC_PATH  = src/
 CXX = c++
 sanitizer = -fsanitize=address -fno-omit-frame-pointer
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98  -g3 # $(sanitizer)
@@ -8,13 +9,14 @@ leak = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 pwd = $(shell pwd):/home/vscode/src
 
-SRCS = main.cpp Server.cpp Client.cpp Command.cpp Commands_utils.cpp Channelcmds.cpp Channel.cpp servError.cpp chcmdsutils.cpp init_socket.cpp
+SRCS = src/main.cpp src/Server.cpp src/Client.cpp src/Command.cpp src/Commands_utils.cpp src/Channelcmds.cpp src/Channel.cpp src/servError.cpp src/chcmdsutils.cpp src/init_socket.cpp
 
-OBJS = $(patsubst %.cpp,$(OBJ_PATH)/%.o,$(SRCS))
+# OBJS 	  = $(patsubst src%.cpp,$(OBJ_PATH)/%.o,$(SRCS))
+OBJS      = $(patsubst $(SRC_PATH)%.cpp,$(OBJ_PATH)/%.o,$(SRCS))
 
 all: $(TARGET)
 
-$(OBJ_PATH)/%.o: %.cpp | $(OBJ_PATH)
+$(OBJ_PATH)/%.o: $(SRC_PATH)%.cpp | $(OBJ_PATH)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(TARGET): $(OBJS)

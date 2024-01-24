@@ -1,5 +1,5 @@
-#include "includes/Commands_utils.hpp"
-#include "includes/Channelcmds.hpp"
+#include "../includes/Commands_utils.hpp"
+#include "../includes/Channelcmds.hpp"
 
 void sendResponse(std::string message, Client *client) {
 	std::string response = ":" + client->hostname + message + "\r\n";

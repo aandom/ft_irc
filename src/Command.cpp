@@ -1,4 +1,4 @@
-#include "includes/Command.hpp"
+#include "../includes/Command.hpp"
 
 Command::Command(Server *server, Client *client, std::string str, int i) {
 	this->server = server;
@@ -320,7 +320,7 @@ void Command::modeCommand() {
 }
 
 void Command::motdCommand() {
-	std::string filename = "ircd.motd";
+	std::string filename = "src/ircd.motd";
 	std::ifstream file;
 	file.open(filename.c_str());
 	if (!file.is_open())

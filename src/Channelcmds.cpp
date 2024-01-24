@@ -1,4 +1,4 @@
-# include "./includes/Channelcmds.hpp"
+# include "../includes/Channelcmds.hpp"
 
 void   sendTopicAndMembers(Channel *channel, Client *client, int isname) {
     std::string topic = channel->getChName();
