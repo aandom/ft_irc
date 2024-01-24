@@ -15,7 +15,7 @@ USER <username> 0 <localhost> :<first_name last_name>
 ```
 
 ### Connect Client using Irssi
-To connect an Irssi client either you have to download Irssi in your machine or you can work in docker container. For docker container you can use 42-Valgrind container(the docker rule in the makefile will create to you multiple container so that you can use one for the server and others for multiple clients). When you run your server follow the below steps to connect clients. 
+To connect an Irssi client, either you have to download Irssi in your machine or you can work in docker container. For docker container you can use 42-Valgrind container(the docker rule in the makefile will create to you multiple container so that you can use one for the server and others for multiple clients). When you run your server follow the below steps to connect clients. 
 ```bash
 irssi
 /set nick <name>
