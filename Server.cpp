@@ -10,7 +10,6 @@ Server::Server(char *argv[]) {
 	this->nfds = 1;
 	this->on = 1;
 	this->end_server = FALSE;
-	this->close_conn = FALSE;
 	this->compress_array = FALSE;
 	this->operator_password = "pa$$word";
 }
@@ -46,7 +45,6 @@ Server &Server::operator=(Server const &src) {
 		this->nfds = src.nfds;
 		this->on = src.on;
 		this->end_server = src.end_server;
-		this->close_conn = src.close_conn;
 		this->compress_array = src.compress_array;
 		this->operator_password = src.operator_password;
 	}
@@ -68,6 +66,7 @@ void Server::ft_poll() {
 
 void Server::close_connection(int i) {
 	std::cout << "Closing connection with fd: " << this->clients[this->fds[i].fd]->fd << std::endl;
+	quit(*this, this->clients[this->fds[i].fd]);
 	delete this->clients[this->fds[i].fd];
 	this->clients.erase(this->fds[i].fd);
 	close(this->fds[i].fd);
@@ -102,19 +101,18 @@ void Server::accept_client () {
 
 void Server::read_client (int i) {
 	bool is_quit = false;
-	this->close_conn = FALSE;
 	std::memset(this->clients[this->fds[i].fd]->buffer, 0, sizeof(this->clients[this->fds[i].fd]->buffer));
 	this->rc = recv(this->fds[i].fd, this->clients[this->fds[i].fd]->buffer, sizeof(this->clients[this->fds[i].fd]->buffer) - 2, 0);
 	if (this->rc < 0) {
 		if (errno != EWOULDBLOCK) {
 			perror("  recv() failed");
-			this->close_conn = TRUE;
+			this->close_connection(i);
 		}
 	}
 	this->clients[this->fds[i].fd]->str += this->clients[this->fds[i].fd]->buffer;
 	if (this->rc == 0) {
-		std::cout << "  Connection closed" << std::endl;
-		this->close_conn = TRUE;
+		this->close_connection(i);
+		return;
 	}
 	// std::cout << "Received " << this->clients[this->fds[i].fd]->str.length() << " bytes in the below string" << std::endl << this->clients[this->fds[i].fd]->str;
 	if (this->clients[this->fds[i].fd]->str.find('\n') != std::string::npos)
@@ -130,11 +128,6 @@ void Server::read_client (int i) {
 		}
 		if (!is_quit && this->clients[this->fds[i].fd]->str.empty() == false)
 			this->clients[this->fds[i].fd]->str.clear();
-	}
-	if (this->close_conn) {
-		close(this->fds[i].fd);
-		this->fds[i].fd = -1;
-		this->compress_array = TRUE;
 	}
 }
 
@@ -161,10 +154,14 @@ void Server::main_loop() {
 		ft_poll();
 		for (int i = 0; i < this->nfds; i++)
 		{
+			std::cout << "fd = " << this->fds[i].fd << " events = " << this->fds[i].revents << std::endl;
 			if(this->fds[i].revents == 0)
 				continue;
 			else if (this->fds[i].revents == (POLLIN | POLLHUP))
+			{
+				std::cout << "this is close connection in main loop " << std::endl;
 				close_connection(i);
+			}
 			else if (this->fds[i].fd == this->socket_fd)
 				accept_client();
 			else

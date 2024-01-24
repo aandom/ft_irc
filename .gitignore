@@ -1,7 +1,5 @@
 .git
 .vscode
-obj
-./obj/*.o
 *.o
 includes/.DS_Store
 .DS_Store

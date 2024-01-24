@@ -54,7 +54,6 @@ class Server {
 		int					nfds;
 		int					on;
 		int					end_server;
-		bool				close_conn;
 		bool				compress_array;
 		std::map<int, Client *>	clients;
 		// clients[gab]
