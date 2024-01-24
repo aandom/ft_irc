@@ -6,7 +6,16 @@
 ```bash
 ./ircserv <port> <password>
 ```
-### Start Client using Irssi
+### Connect Client Locally from host machine
+```bash
+nc localhost <password>
+PASS <pass>
+NICK <nick>
+USER <username> 0 <localhost> :<first_name last_name>
+```
+
+### Connect Client using Irssi
+To connect an Irssi client either you have to download Irssi in your machine or you can work in docker container. For docker container you can use 42-Valgrind container(the docker rule in the makefile will create to you multiple container so that you can use one for the server and others for multiple clients). When you run your server follow the below steps to connect clients. 
 ```bash
 irssi
 /set nick <name>
@@ -14,17 +23,10 @@ irssi
 /set server_reconnect_time -1
 /set real_name <real_name>
 /connect localhost <port> <password>
-
-### Start Server in Docker
-make docker
-make re
-make server
 ```
-### Start Client in Docker
+Alternativly you can create an irssi container using the below steps 
 ```bash
-make docker
-irssi
-(docker run -it --rm --name irssi --network host irssi)
+docker run -it --rm --name irssi --network host irssi
 /set nick <name>
 /set user_name <user name>
 /set real_name <real_name>
@@ -45,13 +47,7 @@ irssi
 /disconnect
 /quit
 ```
-### Start Client Locally
-```bash
-nc localhost <password>
-PASS <pass>
-NICK <nick>
-USER <username> 0 <localhost> :<first_name last_name>
-```
+
 ### Commands Locally
 ```bash
 PRIVMSG <nick to be sent to> : message
