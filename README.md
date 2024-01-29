@@ -1,5 +1,23 @@
 # IRC Project
 
+### Installation
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/aandom/ft_irc.git
+    
+
+2. Navigate to the project directory:
+
+    ```bash
+    cd ft_irc
+    
+
+3. Build the project:
+
+    ```bash
+    make
 ## Usage
 
 ### Start Server
