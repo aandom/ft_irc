@@ -27,7 +27,7 @@ void serverReplyofChannel(std::string code, std::string chname ,std::string mess
 
 void serverReplyofChannelsec(std::string code, std::string message, Client *client)
 {
-	sendResponse1(":" + client->servername + " " + code + "" + message + " ", client);
+	sendResponse1(":" + client->servername + " " + code + message + " ", client);
 }
 
 void srvRplErr(std::string code, std::string chname, Client *client, Server &server)

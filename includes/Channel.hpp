@@ -56,12 +56,9 @@ class Channel
         void    setChLimit(size_t limit);
         void    setTopic(std::string const & topic);
 
-        void    broadcast(std::string msg, Client * exclude);
-
         void    addClient(Client * client);
         void    addAdmin(Client * client);
         void    removeClient(Client * client);
-        void    chick(Client * client, Client * target, std::string reason);
         bool    checkIfMember(const std::string & src);
         bool    isOperator(Client * src);
         bool    getmodeAt(char c);
